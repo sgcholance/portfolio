@@ -1,0 +1,2071 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SkillMorph - AI 멘토 기반 역량 성장 코치 (Final Ver.)</title>
+    <meta name="description" content="정체된 커리어가 고민인가요? AI 멘토가 당신만을 위한 맞춤 성장 로드맵을 제시합니다." />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+
+  :root {
+    --font-inter: "Inter", "Noto Sans KR", sans-serif;
+    --font-space-grotesk: "Space Grotesk", "Noto Sans KR", sans-serif;
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.25 0 0);
+    --card: oklch(0.984 0 0.013 197.137);
+    --card-foreground: oklch(0.398 0 0.071 200.975);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.25 0 0);
+    --primary: oklch(0.485 0.22 264.45); /* SkillMorph Primary: Purple */
+    --primary-foreground: oklch(1 0 0);
+    --secondary: oklch(0.7 0.2 258.93); /* SkillMorph Secondary: Blue */
+    --secondary-foreground: oklch(1 0 0);
+    --muted: oklch(0.961 0 0.006 258.338);
+    --muted-foreground: oklch(0.439 0 0.016 258.338);
+    --accent: oklch(0.85 0.15 85.08); /* SkillMorph Accent: Yellow/Gold */
+    --accent-foreground: oklch(0.25 0 0);
+    --border: oklch(0.922 0 0.006 258.338);
+    --input: oklch(0.961 0 0.006 258.338);
+    --ring: oklch(0.485 0.22 264.45 / 0.5);
+    --radius: 0.5rem;
+    --r-start: 300;
+    --r-end: 900;
+    --feather: 28;
+    --alpha-max: 0.9;
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-inter);
+  }
+  * { border-color: var(--border); }
+  html { scroll-behavior: smooth; }
+  
+  /* --- Sticky Section Styles --- */
+  .h-200vh { height: 200vh; }
+
+ .sticky-content {
+  position: sticky;
+  top: 2vh;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+  /* ===== Scroll Animation Styles START (개선된 버전) ===== */
+  .animate-on-scroll {
+    transition: opacity 1s ease-out, transform 0.7s ease-out;
+  }
+  .fade-in { opacity: 0; }
+  .slide-in-up { opacity: 0; transform: translateY(30px); }
+  .slide-in-left { opacity: 0; transform: translateX(-30px); }
+  .slide-in-right { opacity: 0; transform: translateX(30px); }
+  .zoom-in { opacity: 0; transform: scale(0.9); }
+  .zoom-out { opacity: 0; transform: scale(1.1); }
+
+  .is-visible .animate-on-scroll { opacity: 1; transform: none; }
+  .is-visible .delay-1 { transition-delay: 0.1s; }
+  .is-visible .delay-2 { transition-delay: 0.2s; }
+  .is-visible .delay-3 { transition-delay: 0.3s; }
+  .is-visible .delay-4 { transition-delay: 0.4s; }
+  .is-visible .delay-5 { transition-delay: 0.5s; }
+  /* ===== Scroll Animation Styles END ===== */
+
+  /* ===== Demo Section Styles (Scoped) ===== */
+  #demo .demo-container {
+    --bg: #0b0d12;
+    --surface: rgba(255, 255, 255, 0.06);
+    --surface-2: rgba(255, 255, 255, 0.08);
+    --border: rgba(255, 255, 255, 0.12);
+    --text: #e8eef6;
+    --muted: #a7b0be;
+    --accent1: 102, 126, 234;
+    --accent3: 72, 187, 255;
+    --radius: 18px;
+    --shadow: 0 20px 60px rgba(0, 0, 0, .45);
+    background-color: var(--bg); color: var(--text); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px; width: 100%; max-width: 1200px;
+    box-shadow: var(--shadow); overflow: hidden;
+  }
+  #demo .tabs { display: flex; gap: 8px; align-items: center; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+  #demo .tab { padding: 10px 14px; border-radius: 999px; border: 1px solid transparent; color: var(--text); opacity: .9; background: none; font-size: 15px; cursor: pointer; }
+  #demo .tab:hover { background: var(--surface); }
+  #demo .tab.active { background: var(--surface-2); border-color: var(--border); }
+  #demo .grid { display: grid; gap: 18px; margin-top: 16px; }
+  #demo .cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #demo .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+  #demo .card h3 { margin: 0 0 10px; font-size: 16px; }
+  #demo .muted { color: var(--muted); }
+  #demo .pill { font-size: 12px; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--border); background: rgba(255, 255, 255, .05); }
+  #demo .list { display: flex; flex-direction: column; gap: 10px; }
+  #demo .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border: 1px dashed rgba(255, 255, 255, .12); border-radius: 12px; background: rgba(255, 255, 255, .03); }
+  #demo .kpi { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+  #demo .ring { --p: 76; width: 92px; height: 92px; border-radius: 50%; background: radial-gradient(closest-side, #0b0d12 66%, transparent 67% 100%), conic-gradient(rgba(var(--accent3), .95) calc(var(--p) * 1%), rgba(255, 255, 255, .12) 0); position: relative; border: 1px solid var(--border); }
+  #demo .ring span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 900; }
+  #demo .bars { display: flex; align-items: flex-end; gap: 10px; height: 140px; }
+  #demo .bar { width: 100%; background: linear-gradient(180deg, rgba(var(--accent3), .95), rgba(var(--accent1), .95)); border-radius: 8px 8px 4px 4px; border: 1px solid var(--border); }
+  @media (max-width: 1080px) { #demo .cols-3 { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 720px) { #demo .cols-3 { grid-template-columns: 1fr; } }
+  
+  /* --- Demo View & Modal Styles --- */
+  #demo .view { display: none; animation: fade .22s ease; }
+  #demo .view.active { display: block; }
+  @keyframes fade { from{ opacity:.6; transform: translateY(4px);} to{ opacity:1; transform:none; } }
+  #demo .list .btn { border: 1px solid rgba(255,255,255,.2); border-radius: 12px; padding: 10px 14px; cursor: pointer; color: #081018; font-weight: 800; background: linear-gradient(135deg, rgba(var(--accent3),.95), rgba(var(--accent1),.95)); }
+  .modal { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(8,10,14,.8); backdrop-filter: blur(8px); z-index: 60; }
+  .dialog { width: min(560px, 92vw); border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,.2); box-shadow: var(--shadow); background: #1c1e26; }
+  .dialog header { padding: 14px 16px; font-weight: 900; border-bottom: 1px solid rgba(255,255,255,.15); background: rgba(255,255,255,.05); color: #e8eef6; }
+  .dialog main { padding: 20px; color: #e8eef6; }
+  .dialog footer { display: flex; justify-content: flex-end; gap: 10px; padding: 12px 16px; border-top: 1px solid rgba(255,255,255,.15); }
+  .dialog footer .btn { border-radius: 12px; padding: 10px 16px; cursor: pointer; font-weight: 800; border: 1px solid transparent; }
+  .dialog footer .btn.ghost { background: transparent; color: #e8eef6; border-color: rgba(255,255,255,.3); }
+  .dialog footer .btn:not(.ghost) { background: #e8eef6; color: #1c1e26; }
+
+  /* ===== Parallax Styles START ===== */
+  #parallax-bg { transition: transform 0.2s ease-out; }
+  /* ===== Parallax Styles END ===== */
+
+  /* ===== Hover Animation Styles START ===== */
+  .h-transition { transition: all 0.3s ease-out; }
+  .hover-lift:hover { transform: translateY(-6px); box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1); }
+  .hover-gradient-fill { position: relative; z-index: 1; overflow: hidden; }
+  .hover-gradient-fill::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, var(--primary), var(--secondary)); opacity: 0; z-index: -1; transition: opacity 0.4s ease-out; }
+  .hover-gradient-fill:hover::before { opacity: 1; }
+  .hover-gradient-fill:hover, .hover-gradient-fill:hover h3, .hover-gradient-fill:hover p { color: var(--primary-foreground); }
+  .hover-step-highlight .step-circle { transition: all 0.3s ease-out; }
+  .hover-step-highlight:hover .step-circle { transform: scale(1.1); background-color: var(--accent); color: var(--accent-foreground); }
+  .hover-pricing-card { background-color: var(--background); color: var(--foreground); }
+  .hover-pricing-card, .hover-pricing-card .text-primary, .hover-pricing-card .bg-primary { transition: all 0.4s ease-out; }
+  .hover-pricing-card:hover { background: linear-gradient(135deg, oklch(0.5 0.25 260), var(--secondary)); color: var(--primary-foreground); }
+  .hover-pricing-card:hover h3, .hover-pricing-card:hover p, .hover-pricing-card:hover span { color: var(--primary-foreground) !important; }
+  .hover-pricing-card:hover .text-primary { color: var(--primary-foreground); }
+  .hover-pricing-card:hover .bg-primary { background-color: var(--primary-foreground); color: var(--primary); }
+  .hover-scale:hover { transform: scale(1.05); }
+  .hover-press:hover { transform: scale(0.97); }
+  .hover-gradient-fill-yellow { position: relative; z-index: 1; overflow: hidden; }
+  .hover-gradient-fill-yellow::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, oklch(0.98 0.07 85), oklch(0.95 0.1 90)); opacity: 0; z-index: -1; transition: opacity 0.4s ease-out; }
+  .hover-gradient-fill-yellow:hover::before { opacity: 1; }
+  .hover-gradient-fill-yellow:hover h3, .hover-gradient-fill-yellow:hover p { color: var(--accent-foreground); }
+  .footer-icon { opacity: 0; transform: translateY(20px); transition: all 0.3s ease-out 0.1s; font-size: 2.5rem; line-height: 1; margin-top: 1rem; }
+  .hover-gradient-fill:hover .footer-icon { opacity: 0.7; transform: translateY(0); }
+  /* ===== Hover Animation Styles END ===== */
+
+  /* ===== Toast Popup Styles START ===== */
+  #toast-popup { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(200%); background-color: oklch(0.2 0.05 260); color: oklch(0.95 0.01 260); padding: 1rem 1.5rem; border-radius: 999px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); opacity: 0; transition: transform 0.4s ease-out, opacity 0.4s ease-out; z-index: 100; font-weight: 500; }
+  #toast-popup.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  /* ===== Toast Popup Styles END ===== */
+
+  /* ===== 추가 기능 CSS START ===== */
+  .nav-link.active { color: var(--foreground); font-weight: 600; }
+  #typing-subtitle::after { content: '|'; animation: blink 0.7s infinite; font-weight: 400; position: relative; top: -2px; margin-left: 2px; }
+  @keyframes blink { 50% { opacity: 0; } }
+  /* ===== 추가 기능 CSS END ===== */
+
+  /* ===== 3D Object Styles START ===== */
+  #hero-3d-object { position: relative; z-index: -1; box-shadow: none; filter: none; animation: float 6s ease-in-out infinite; display: block; margin: -5rem auto; max-width: 350px; width: 100%; height: auto; transform: none; }
+  @media (max-width: 768px) { #hero-3d-object { display: none; } }
+  @keyframes float { 0% { transform: translateY(25%); } 50% { transform: translateY(10%); } 100% { transform: translateY(25%); } }
+  /* ===== 3D Object Styles END ===== */
+/* ===== Mask Overlay Styles START ===== */
+
+/* ===== Mask Overlay Styles START ===== */
+.mask-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+
+  /* 블랙톤 radial 그라디언트(오로라 컬러 제거) */
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(0,0,0, var(--alpha, var(--alpha-max))) 0%,
+    rgba(30,30,30, var(--alpha, var(--alpha-max))) 55%,
+    rgba(0,0,0, var(--alpha, var(--alpha-max))) 100%
+  );
+  background-size: 200% 200%;
+
+  /* 배경에 약한 포지션 변화(있어도 되고 빼도 됨) */
+  animation: aurora-shift 18s ease-in-out infinite alternate;
+
+  /* 전체 톤 조정 */
+  filter: blur(12px) saturate(1.1);
+
+  /* 👉 핵심: 원형 마스크(스크롤/호흡으로 반경 변경) */
+  -webkit-mask-image: radial-gradient(
+    circle at 50% 50%,
+    rgba(0,0,0,0) calc(var(--r) * 1px),
+    rgba(0,0,0,1) calc((var(--r) + var(--feather)) * 1px)
+  );
+  mask-image: radial-gradient(
+    circle at 50% 50%,
+    rgba(0,0,0,0) calc(var(--r) * 1px),
+    rgba(0,0,0,1) calc((var(--r) + var(--feather)) * 1px)
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+
+  transition: opacity .1s linear;
+}
+
+@keyframes aurora-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+/* ===== Mask Overlay Styles END ===== */
+
+  /* ===== ★★★ 색상 반전 효과 CSS START (최종 수정본) ★★★ ===== */
+  #problem {
+    /* 색상 변경이 부드럽게 일어나도록 transition 추가 */
+    transition: background-color 0.7s ease-out;
+  }
+
+  /* #problem 섹션 내부의 모든 요소에 부드러운 색상 전환 효과 적용 */
+  #problem * {
+    transition: background-color 0.7s ease-out, color 0.7s ease-out;
+  }
+
+  /* 색상 반전이 활성화되었을 때의 스타일 */
+  #problem.section-inverted {
+    background-color: var(--foreground) !important; /* 섹션 배경을 어둡게 */
+  }
+
+  /* 반전 시 섹션의 제목(h2)과 부제목(p) 색상을 직접 지정 */
+  #problem.section-inverted h2 {
+    color: var(--card) !important; /* Tailwind 규칙을 이기기 위해 !important 추가 */
+  }
+  #problem.section-inverted p {
+    color: oklch(0.8 0.01 258) !important; /* 가독성을 위해 이전보다 밝게 수정 & !important 추가 */
+  }
+
+  /* 반전 시 섹션 내부 카드들의 배경을 어둡게 */
+  #problem.section-inverted .bg-background {
+    background-color: oklch(0.3 0 0) !important;
+  }
+
+  /* 반전 시 카드 내부 텍스트 색상을 밝게 */
+  #problem.section-inverted .bg-background h3,
+  #problem.section-inverted .bg-background p {
+    color: var(--background) !important;
+  }
+
+  #problem.section-inverted h2 {
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+}
+
+
+
+/* 스타일 맨 아래에 추가 */
+body:has(#problem.section-inverted) nav{
+  background-color: var(--foreground) !important;
+  color: var(--card) !important;
+}
+body:has(#problem.section-inverted) nav .nav-link{
+  color: oklch(0.80 0.01 258) !important;
+}
+body:has(#problem.section-inverted) nav .nav-link:hover,
+body:has(#problem.section-inverted) nav .nav-link.active{
+  color: var(--background) !important;
+}
+
+  /* ===== ★★★ 색상 반전 효과 CSS END ★★★ ===== */
+
+/* problem float 애니메이션 */
+
+    @keyframes floaty {
+    0%   { transform: translateY(10px); }
+    50%  { transform: translateY(-10px); }
+    100% { transform: translateY(10px); }
+  }
+  /* 보이는 PNG는 항상 둥실둥실 */
+  #problem-icon-img {
+    animation: floaty 2.5s ease-in-out infinite;
+    will-change: transform;
+  }
+  /* 모션 민감 사용자 배려 (선택) */
+  @media (prefers-reduced-motion: reduce) {
+    #problem-icon-img { animation: none; }
+  }
+
+/* 마스크 보이는 동안 nav를 밝게 반전 */
+nav.invert-nav {
+  background-color: transparent !important;
+  color: #fff !important;
+}
+nav.invert-nav .nav-link {
+  color: #fff !important;
+}
+nav.invert-nav .nav-link:hover,
+nav.invert-nav .nav-link.active {
+  color: var(--accent) !important; /* 원하면 var(--background) 등으로 변경 */
+}
+
+
+
+/* features 자동 활성화용: hover 효과를 is-active에도 동일 적용 */
+/* hover == is-active 동일 처리 */
+#features .hover-gradient-fill-yellow.is-active::before { opacity: 1; }
+#features .hover-gradient-fill-yellow.is-active,
+#features .hover-gradient-fill-yellow.is-active h3,
+#features .hover-gradient-fill-yellow.is-active p { color: var(--accent-foreground); }
+#features .hover-gradient-fill-yellow { transition: all 0.4s ease-out; }
+
+/* 프리뷰 패널 */
+.feature-demo-panel{ position:relative; width:100%; margin-top:2rem; border:1px solid var(--border, rgba(255,255,255,0.08)); border-radius:16px; background:rgba(255,255,255,0.03); backdrop-filter:blur(6px); overflow:hidden; }
+.feature-demo-header{ display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--border, rgba(255,255,255,0.06)); font-weight:600; letter-spacing:.2px; }
+.feature-demo-stage{ padding:16px; min-height:200px; }
+.demo-card{border:1px solid rgba(255,255,255,0.08); border-radius:12px; overflow:hidden;}
+.demo-bar{display:flex; align-items:center; gap:8px; padding:10px 12px; background:rgba(255,255,255,0.04);}
+.demo-bar .dot{width:8px;height:8px;border-radius:999px;background:rgba(255,255,255,0.25);}
+.demo-title{margin-left:auto; font-size:12px; opacity:.7}
+.demo-body{display:grid; grid-template-columns: 1fr 1.2fr; gap:16px; padding:14px;}
+.demo-list .demo-item{padding:8px 10px; border-radius:8px; background:rgba(255,255,255,0.03); margin-bottom:8px;}
+.demo-list .demo-item.active{outline:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.06);}
+.demo-form{display:grid; gap:8px}
+.demo-form label{font-size:12px; opacity:.75}
+.demo-form input, .demo-form select{background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:8px 10px; color:inherit}
+.demo-btn{margin-top:4px; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:transparent; cursor:pointer}
+.demo-preview{background:rgba(255,255,255,0.03); border:1px dashed rgba(255,255,255,0.12); border-radius:8px; padding:10px}
+.mono{font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; opacity:.75}
+.demo-brand{display:flex; align-items:center; gap:10px; margin-bottom:10px}
+.demo-brand .swatch{width:22px;height:22px;border-radius:6px;border:1px solid rgba(255,255,255,0.18)}
+.brand-h{font-size:24px; line-height:36px; font-weight:600}
+
+
+/* === MVP Screenshot Theme (scoped) === */
+#feature-demo .mvp-theme{
+  --bg:#0b0d12;
+  --surface: rgba(255,255,255,0.06);
+  --surface-2: rgba(255,255,255,0.08);
+  --border: rgba(255,255,255,0.12);
+  --text:#e8eef6;
+  --muted:#a7b0be;
+  --accent1: 102,126,234;
+  --accent2: 118,75,162;
+  --accent3: 72,187,255;
+  --radius: 14px;
+}
+
+/* 스크린샷 프레임 */
+#feature-demo .mvp-snap{
+  position: relative;
+  border:1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  background:
+    radial-gradient(1200px 600px at 90% -10%, rgba(var(--accent3), .18), transparent 50%),
+    radial-gradient(900px 500px at 0% 0%, rgba(var(--accent1), .15), transparent 55%),
+    #0a0c11;
+  box-shadow: 0 20px 60px rgba(0,0,0,.45);
+  padding-bottom: 14px;
+}
+
+/* 윈도우바(스크린샷 느낌) */
+#feature-demo .mvp-windowbar{
+  display:flex; align-items:center; gap:8px;
+  height:36px; padding:0 12px;
+  background: linear-gradient(180deg, rgba(10,12,17,.75), rgba(10,12,17,.35));
+  border-bottom:1px solid var(--border);
+  position:sticky; top:0; z-index:1;
+}
+#feature-demo .mvp-windowbar .wdot{
+  width:10px; height:10px; border-radius:999px; display:inline-block;
+  background: rgba(255,255,255,.25); box-shadow: inset 0 0 6px rgba(255,255,255,.4);
+}
+#feature-demo .mvp-windowbar .wlabel{ margin-left:auto; font-size:12px; opacity:.75}
+
+/* 히어로 오브(정지) */
+#feature-demo .mvp-hero{ padding:14px; }
+#feature-demo .mvp-orb{
+  position: relative; height: 220px; border-radius: 18px; overflow:hidden;
+  border:1px solid var(--border);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.02)),
+    radial-gradient(120% 160% at 0% 0%, rgba(255,255,255,.06), transparent 60%);
+  backdrop-filter: blur(8px) saturate(120%);
+  box-shadow: 0 30px 80px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.06) inset;
+}
+#feature-demo .mvp-orb .orb-bg{
+  position:absolute; inset:-30%;
+  background:
+    radial-gradient(closest-side at 15% 30%, rgba(72,187,255,.35), transparent 60%),
+    radial-gradient(closest-side at 85% 20%, rgba(102,126,234,.35), transparent 60%),
+    radial-gradient(closest-side at 60% 80%, rgba(118,75,162,.35), transparent 60%);
+  filter: blur(18px) saturate(110%);
+}
+#feature-demo .mvp-orb .orb-sweep{
+  position:absolute; inset:-20%;
+  background: linear-gradient(75deg, rgba(255,255,255,0) 40%, rgba(255,255,255,.12) 55%, rgba(255,255,255,0) 70%);
+  transform: translateX(0) skewX(-12deg); mix-blend-mode: screen; pointer-events:none;
+}
+#feature-demo .mvp-orb .orb-grid{
+  position:absolute; inset:0; pointer-events:none; opacity:.75;
+  background:
+    linear-gradient(to right, rgba(255,255,255,.08) 1px, transparent 1px) 0 0/ 40px 40px,
+    linear-gradient(to bottom, rgba(255,255,255,.06) 1px, transparent 1px) 0 0/ 40px 40px;
+  mask: linear-gradient(180deg, transparent, #000 20% 80%, transparent);
+}
+#feature-demo .mvp-orb .orb-chart{
+  position:absolute; left:16px; right:16px; bottom:16px; height:140px; width: calc(100% - 32px); mix-blend-mode:screen;
+}
+
+/* 카드 공통 */
+#feature-demo .mvp-grid3{ display:grid; grid-template-columns: 1.1fr 1fr 1fr; gap:14px; padding: 0 14px; }
+#feature-demo .mvp-grid2{ display:grid; grid-template-columns: 1fr 1fr; gap:14px; padding: 14px; }
+#feature-demo .mvp-card{
+  background: var(--surface); border:1px solid var(--border);
+  border-radius: var(--radius); padding: 14px;
+}
+#feature-demo .mvp-card h4{ margin:0 0 10px; font-size:14px; letter-spacing:.2px; }
+#feature-demo .muted{ color: var(--muted); }
+#feature-demo .muted.tiny{ font-size:12px; }
+#feature-demo .right{ text-align:right; }
+
+/* KPI 카드 */
+#feature-demo .kpi{ display:flex; align-items:center; justify-content:space-between; gap:14px; }
+#feature-demo .kpi .kpi-num{ font-size:24px; font-weight:900; letter-spacing:-.02em; }
+#feature-demo .kpi-ring{
+  --p:76;
+  width: 82px; height:82px; border-radius:50%;
+  background:
+    radial-gradient(closest-side, #0a0c11 66%, transparent 67% 100%),
+    conic-gradient(rgba(var(--accent3), .95) calc(var(--p)*1%), rgba(255,255,255,.12) 0);
+  position:relative; border:1px solid var(--border);
+}
+#feature-demo .kpi-ring span{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-weight:900; }
+
+/* 리스트/뱃지/버튼 */
+#feature-demo .list{ display:flex; flex-direction:column; gap:8px; }
+#feature-demo .row{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:10px 12px; border:1px dashed rgba(255,255,255,.12); border-radius:12px; background: rgba(255,255,255,.03);
+  min-height: 44px;
+}
+#feature-demo .pill{ font-size:11px; padding:6px 10px; border-radius:999px; border:1px solid var(--border); background: rgba(255,255,255,.05); white-space:nowrap; }
+#feature-demo .btn{ border:1px solid rgba(255,255,255,.2); border-radius: 10px; padding: 8px 12px; font-weight:800; background: linear-gradient(135deg, rgba(var(--accent3),.95), rgba(var(--accent1),.95)); color:#081018; }
+#feature-demo .btn-ghost{ border:1px solid var(--border); border-radius:10px; padding:6px 10px; color:var(--text); background:transparent; font-weight:800; font-size:12px; }
+
+/* 바차트 */
+#feature-demo .bars-wrap{ display:flex; align-items:flex-end; gap:8px; height: 110px; }
+#feature-demo .bars-wrap i{
+  display:block; width:18px; border-radius:8px 8px 4px 4px; border:1px solid var(--border);
+  background: linear-gradient(180deg, rgba(var(--accent3),.95), rgba(var(--accent1),.95));
+}
+
+/* 반응형 축소 */
+@media (max-width: 900px){
+  #feature-demo .mvp-grid3{ grid-template-columns: 1fr; }
+  #feature-demo .mvp-grid2{ grid-template-columns: 1fr; }
+}
+
+
+/* ① 패널 높이 고정: 카드 전환해도 높이 유지 */
+#feature-demo .feature-demo-stage{
+  overflow: hidden;     /* 내부 스크롤/잘림 방지용 */
+  position: relative;
+}
+
+/* ② MVP 스냅샷 컬러 튜닝(가독성 ↑) */
+#feature-demo .mvp-theme{
+  --text: #f2f6ff;      /* 본문 텍스트 더 밝게 */
+  --muted:#cbd5e1;      /* 보조 텍스트 밝게 */
+  --border: rgba(255,255,255,0.18); /* 경계 살짝 강조 */
+}
+#feature-demo .mvp-theme, 
+#feature-demo .mvp-theme *{
+  color: var(--text);
+}
+#feature-demo .mvp-theme .muted{ color: var(--muted); }
+
+/* 1) 라인그래프 히어로 높이 50%로 축소 */
+#feature-demo .mvp-orb{ 
+  /* 기존: height: 260px; */
+  height: 130px; /* 50% */
+}
+#feature-demo .mvp-orb .orb-chart{
+  /* 기존: height: 150px; bottom:14px; */
+  height: 75px;       /* 50% */
+  bottom: 10px;       /* 살짝만 올려 균형 */
+  left: 8px; right: 8px; width: calc(100% - 16px);
+}
+
+/* 2) 패널/스테이지에서 잘림 제거 */
+.feature-demo-panel{
+  /* 기존: overflow: hidden; */
+  overflow: visible;
+}
+
+/* 고정 권장안 */
+#feature-demo-stage{
+  overflow: hidden !important;   /* 내용 잘림 걱정은 '최대높이 측정'으로 해결 */
+  transition: none !important;   /* height 애니메이션 금지 (전역 transition:all 대응) */
+}
+
+
+/* (참고) 바차트도 약간 키워서 밸런스 ↑ */
+#feature-demo .bars .bars-wrap{ height: 120px; }
+
+/* ====== ④ 은은한 애니메이션(가벼움 유지) ====== */
+/* 선 그리기 느낌 */
+#feature-demo .anim-line path[data-line]{
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: mvp-line-draw 3.6s ease-out forwards, mvp-line-glow 5s ease-in-out infinite alternate 1.2s;
+}
+@keyframes mvp-line-draw { to { stroke-dashoffset: 0; } }
+@keyframes mvp-line-glow { 
+  0% { filter: drop-shadow(0 0 0 rgba(120,180,255,0)); }
+  100%{ filter: drop-shadow(0 0 10px rgba(120,180,255,.45)); }
+}
+
+/* 오브젝트 스윕(유리 위 하이라이트가 천천히 지나감) */
+#feature-demo .anim-sweep .orb-sweep{
+  animation: mvp-sweep 6s linear infinite;
+}
+@keyframes mvp-sweep {
+  0%   { transform: translateX(-40%) skewX(-12deg); opacity:.3; }
+  50%  { transform: translateX(20%)  skewX(-12deg); opacity:.5; }
+  100% { transform: translateX(80%)  skewX(-12deg); opacity:.25;}
+}
+
+/* 바차트에 살짝 리듬 */
+#feature-demo .anim-bars .bars-wrap i{
+  transform-origin: bottom center;
+  animation: mvp-bar 2.8s ease-in-out infinite;
+}
+#feature-demo .anim-bars .bars-wrap i:nth-child(odd){ animation-delay: .6s; }
+#feature-demo .anim-bars .bars-wrap i:nth-child(3){ animation-delay: .9s; }
+#feature-demo .anim-bars .bars-wrap i:nth-child(5){ animation-delay: 1.2s; }
+@keyframes mvp-bar {
+  0%   { transform: scaleY(1.00); }
+  50%  { transform: scaleY(1.08); }
+  100% { transform: scaleY(1.00); }
+}
+
+/* KPI 링 은은한 호흡 */
+#feature-demo .kpi-ring{
+  box-shadow: 0 0 0 rgba(72,187,255,0);
+  animation: mvp-ring 4.2s ease-in-out infinite;
+}
+@keyframes mvp-ring{
+  0%   { box-shadow: 0 0 0 rgba(72,187,255,0); }
+  50%  { box-shadow: 0 0 26px rgba(72,187,255,.25); }
+  100% { box-shadow: 0 0 0 rgba(72,187,255,0); }
+}
+
+/* 모션 민감 사용자 배려 */
+@media (prefers-reduced-motion: reduce){
+  #feature-demo .anim-line path[data-line],
+  #feature-demo .anim-sweep .orb-sweep,
+  #feature-demo .anim-bars .bars-wrap i,
+  #feature-demo .kpi-ring{ animation:none !important; }
+}
+
+/* 통일 높이 변수로 강제 적용 */
+#feature-demo .mvp-snap,
+#feature-demo .mvp-theme,
+#feature-demo .anim-line,
+#feature-demo .anim-sweep,
+#feature-demo .anim-bars{
+  height: var(--mvp-unified-h, auto) !important;
+  min-height: var(--mvp-unified-h, auto) !important;
+}
+
+/* ===== for-who 색상 반전 (problem과 동일 톤) ===== */
+#for-who { 
+  transition: background-color 0.7s ease-out; 
+}
+#for-who * {
+  transition: background-color 0.7s ease-out, color 0.7s ease-out;
+}
+
+/* 섹션 반전 상태 */
+#for-who.section-inverted {
+  background-color: var(--foreground) !important;
+}
+
+/* 타이틀/본문 톤 업 */
+#for-who.section-inverted h2 {
+  color: var(--card) !important;
+}
+#for-who.section-inverted p {
+  color: oklch(0.8 0.01 258) !important;
+}
+
+/* 카드 배경/텍스트 반전 */
+#for-who.section-inverted .bg-background {
+  background-color: oklch(0.3 0 0) !important;
+}
+#for-who.section-inverted .bg-background h3,
+#for-who.section-inverted .bg-background p {
+  color: var(--background) !important;
+}
+
+/* 네비게이션도 섹션 반전 시 톤 맞춤 */
+body:has(#for-who.section-inverted) nav{
+  background-color: var(--foreground) !important;
+  color: var(--card) !important;
+}
+body:has(#for-who.section-inverted) nav .nav-link{
+  color: oklch(0.80 0.01 258) !important;
+}
+body:has(#for-who.section-inverted) nav .nav-link:hover,
+body:has(#for-who.section-inverted) nav .nav-link.active{
+  color: var(--background) !important;
+}
+
+/* ===== Invert on: 강제 텍스트 색 상속 (problem / for-who 공통) ===== */
+#problem.section-inverted,
+#for-who.section-inverted {
+  color: #fff !important;                 /* 섹션 기본 텍스트를 화이트로 */
+}
+
+/* 헤딩·문단·스팬 등 모든 텍스트 노드가 상속받게 강제 */
+#problem.section-inverted :is(h1,h2,h3,h4,h5,h6,p,li,span,small,strong,em,blockquote,
+  .text-base,.text-lg,.text-xl,.text-2xl,.text-3xl,.text-4xl,.text-5xl,.font-serif,.font-bold),
+#for-who.section-inverted :is(h1,h2,h3,h4,h5,h6,p,li,span,small,strong,em,blockquote,
+  .text-base,.text-lg,.text-xl,.text-2xl,.text-3xl,.text-4xl,.text-5xl,.font-serif,.font-bold) {
+  color: inherit !important;               /* 어떤 text-* 유틸이 있어도 섹션 색을 따르게 */
+  -webkit-text-fill-color: currentColor !important; /* 사파리/클립텍스트 대비 */
+}
+
+/* (선택) muted 톤을 살짝만 낮추고 싶다면 반전 상태에서만 톤 보정 */
+#problem.section-inverted .text-muted-foreground,
+#for-who.section-inverted .text-muted-foreground {
+  color: rgba(255,255,255,0.82) !important;
+}
+
+/* for-who 자동호버: hover == is-active 동일 적용 */
+#for-who .hover-gradient-fill.is-active::before { opacity: 1; }
+#for-who .hover-gradient-fill.is-active,
+#for-who .hover-gradient-fill.is-active h3,
+#for-who .hover-gradient-fill.is-active p {
+  color: var(--primary-foreground);
+}
+/* ▼▼▼ 이 부분을 추가해주세요 ▼▼▼ */
+#for-who .hover-gradient-fill.is-active .footer-icon {
+  opacity: 0.7;
+  transform: translateY(0);
+}
+/* 1. #demo 섹션에 부드러운 배경색 전환 효과 추가 */
+#demo {
+  transition: background-color 0.7s ease-out;
+}
+
+/* 2. #for-who가 반전될 때 #demo의 배경색도 함께 반전 */
+body:has(#for-who.section-inverted) #demo {
+  background-color: var(--foreground) !important;
+}
+
+/* ===== 반응형 스타일: 모바일 & 태블릿 ===== */
+/* ===== 동적 레이아웃 전환 스타일 (JS 제어) ===== */
+
+/* JS가 콘텐츠 오버플로우를 감지하고 .layout-static 클래스를 추가할 때 적용될 스타일 */
+.h-200vh.layout-static {
+  height: auto;
+  padding-top: 6rem;
+  padding-bottom: 6rem;
+}
+
+.h-200vh.layout-static .sticky-content {
+  position: static;
+  height: auto;
+  justify-content: flex-start;
+}
+
+
+/* ===== 유동적 타이포그래피 (Responsive Headings) - 수정안 ===== */
+h1 {
+  /* 기존: 36px ~ 60px */
+  /* 수정: 30px ~ 48px */
+  font-size: clamp(1.875rem, 1.25rem + 3.5vw, 3rem);
+    word-break: keep-all; /* 단어 단위로 줄바꿈하도록 추가 */
+
+}
+
+h2 {
+  /* 기존: 30px ~ 48px */
+  /* 수정: 24px ~ 36px */
+  font-size: clamp(1.5rem, 1.1rem + 2.5vw, 2.25rem);
+    word-break: keep-all; /* h2에도 동일하게 적용하여 통일성 유지 */
+
+}
+
+/* ===== 동적 로고 표시 스타일 ===== */
+
+/* 기본 상태 (배경이 밝을 때) */
+.logo-white {
+  display: none; /* 흰색 로고는 기본적으로 숨김 */
+}
+.logo-black {
+  display: block; /* 검은색 로고는 기본적으로 표시 */
+}
+
+/* 로고 상태 변경 (배경이 어두워질 때) */
+
+/* 1. Hero의 마스크가 활성화될 때 (nav.invert-nav) 또는
+   2. 어두운 섹션(.section-inverted)이 활성화될 때 */
+nav.invert-nav .logo-white,
+body:has(.section-inverted) nav .logo-white {
+  display: block; /* 흰색 로고를 표시 */
+}
+
+nav.invert-nav .logo-black,
+body:has(.section-inverted) nav .logo-black {
+  display: none; /* 검은색 로고를 숨김 */
+}
+
+
+    </style>
+    
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              fontFamily: {
+                sans: ['Inter', 'Noto Sans KR', 'sans-serif'],
+                serif: ['Space Grotesk', 'Noto Sans KR', 'sans-serif'],
+              },
+              colors: {
+                background: 'var(--background)', foreground: 'var(--foreground)', card: 'var(--card)', 'card-foreground': 'var(--card-foreground)', popover: 'var(--popover)', 'popover-foreground': 'var(--popover-foreground)', primary: 'var(--primary)', 'primary-foreground': 'var(--primary-foreground)', secondary: 'var(--secondary)', 'secondary-foreground': 'var(--secondary-foreground)', muted: 'var(--muted)', 'muted-foreground': 'var(--muted-foreground)', accent: 'var(--accent)', 'accent-foreground': 'var(--accent-foreground)', border: 'var(--border)', input: 'var(--input)', ring: 'var(--ring)',
+              },
+              borderRadius: { lg: 'var(--radius)', md: 'calc(var(--radius) - 2px)', sm: 'calc(var(--radius) - 4px)', },
+            },
+          },
+        };
+    </script>
+</head>
+<body class="font-sans antialiased">
+    <div id="top" class="min-h-screen bg-background">
+        <nav class="fixed top-0 w-full z-[10000] transition-all duration-300 bg-background/80 backdrop-blur-sm shadow-sm">
+    <div class="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
+        <a href="#top" class="flex items-center">
+    <img src="source/logo/Primary Logo-logo_black.png" alt="SkillMorph Logo" class="logo-black h-20 w-auto">
+    <img src="source/logo/Primary Logo-logo_white.png" alt="SkillMorph Logo" class="logo-white h-20 w-auto">
+</a>
+        <div class="hidden md:flex items-center gap-8 text-sm">
+            <a href="#problem" class="text-muted-foreground hover:text-foreground transition-colors nav-link">어려움</a>
+            <a href="#features" class="text-muted-foreground hover:text-foreground transition-colors nav-link">핵심 기능</a>
+            <a href="#process" class="text-muted-foreground hover:text-foreground transition-colors nav-link">작동 방식</a>
+            <a href="#demo" class="text-muted-foreground hover:text-foreground transition-colors nav-link">미리보기</a>
+            <a href="#for-who" class="text-muted-foreground hover:text-foreground transition-colors nav-link">대상</a>
+            <a href="#pricing" class="text-muted-foreground hover:text-foreground transition-colors nav-link">가격</a>
+        </div>
+        <a href="#pricing" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 h-transition hover-scale">무료로 시작하기</a>
+    </div>
+</nav>
+
+<section id="reveal-mask" class="h-200vh relative">
+    <div class="mask-overlay" aria-hidden="true"></div>
+
+    <div class="sticky-content overflow-hidden">
+        <div id="parallax-bg" class="absolute inset-0 -z-10"><div class="absolute top-20 left-10 w-72 h-72 bg-secondary/10 rounded-full blur-3xl"></div><div class="absolute bottom-20 right-10 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div></div>
+        
+        <div class="text-center max-w-7xl mx-auto px-6 relative z-10">
+            
+
+            <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold mb-6 bg-card text-card-foreground border-border"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>AI 멘토 기반 역량 성장 코치</div>
+            
+            <img id="hero-3d-object" src="source/hero/cropped-ezgif-7357e29685a1a2.gif" alt="3D Object Placeholder">
+            
+            <h1 class="text-6xl md:text-8xl font-serif font-bold mt-6 mb-8 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent leading-tight">당신의 스킬은<br>계속 진화한다.</h1>
+            
+            <p id="typing-subtitle" class="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed"></p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+               <a href="#demo" class="inline-flex items-center justify-center rounded-md text-sm font-medium h-11 px-8 py-3 bg-primary text-primary-foreground hover:bg-primary/90 h-transition hover-scale">내 성장 가능성 진단하기<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="ml-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+                <a href="#pricing" class="inline-flex items-center justify-center rounded-md text-sm font-medium border h-11 px-8 py-3 bg-transparent border-border h-transition hover-lift">자세히 알아보기</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="problem" class="h-200vh relative bg-card">
+  <div class="sticky-content">
+    <div class="max-w-7xl mx-auto px-6 w-full">
+      <div class="text-center mb-16 animate-on-scroll slide-in-up">
+        <h2 class="text-5xl font-serif font-bold mb-6">열심히는 하는데,<br>제대로 성장하고 있긴 할까요?</h2>
+        <p class="text-xl text-muted-foreground max-w-3xl mx-auto">많은 사람들이 성장의 과정에서 <br class="md:hidden"> 비슷한 어려움을 겪습니다.</p>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <!-- 왼쪽 카드들 -->
+        <div class="space-y-8" id="problem-card-col">
+          <!-- 방향성 부재 -->
+          <div
+            class="problem-card flex gap-6 p-6 rounded-xl bg-background shadow-sm animate-on-scroll zoom-in delay-1 h-transition hover-gradient-fill"
+            data-icon-img="source/problem/final/2-removebg-preview.png"
+            data-label="방향성 부재">
+            <span class="text-2xl">🧭</span>
+            <div>
+              <h3 class="text-xl font-semibold mb-2">방향성 부재</h3>
+              <p class="leading-relaxed">어떤 강의부터 들어야 할지, 지금 나에게 뭘 공부해야 할지 막막해요.</p>
+            </div>
+          </div>
+
+          <!-- 실무 연계 부족 -->
+          <div
+            class="problem-card flex gap-6 p-6 rounded-xl bg-background shadow-sm animate-on-scroll zoom-in delay-2 h-transition hover-gradient-fill"
+            data-icon-img="source/problem/final/3-removebg-preview.png"
+            data-label="실무 연계 부족">
+            <span class="text-2xl">🧩</span>
+            <div>
+              <h3 class="text-xl font-semibold mb-2">실무 연계 부족</h3>
+              <p class="leading-relaxed">강의는 들었지만, 막상 실무에 어떻게 적용해야 할지 모르겠어요.</p>
+            </div>
+          </div>
+
+          <!-- 동기 부여 저하 -->
+          <div
+            class="problem-card flex gap-6 p-6 rounded-xl bg-background shadow-sm animate-on-scroll zoom-in delay-3 h-transition hover-gradient-fill"
+            data-icon-img="source/problem/final/4-removebg-preview.png"
+            data-label="동기 부여 저하">
+            <span class="text-2xl">🪫</span>
+            <div>
+              <h3 class="text-xl font-semibold mb-2">동기 부여 저하</h3>
+              <p class="leading-relaxed">내 성장이 눈에 보이지 않으니 지치고, 꾸준히 하기가 어려워요.</p>
+            </div>
+          </div>
+
+          <!-- 피드백 갈증 -->
+          <div
+            class="problem-card flex gap-6 p-6 rounded-xl bg-background shadow-sm animate-on-scroll zoom-in delay-4 h-transition hover-gradient-fill"
+            data-icon-img="source/problem/final/5-removebg-preview.png"
+            data-label="피드백 갈증">
+            <span class="text-2xl">💬</span>
+            <div>
+              <h3 class="text-xl font-semibold mb-2">피드백 갈증</h3>
+              <p class="leading-relaxed">제대로 하고 있는지 봐줄 사수나 멘토가 주변에 없어요.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 오른쪽 프리뷰 카드 (아이콘 + 텍스트 포맷 유지) -->
+        <div class="relative animate-on-scroll slide-in-right delay-5">
+          <div class="bg-gradient-to-br from-primary/20 to-secondary/20 rounded-3xl p-8">
+            <div id="problem-preview"
+                 class="relative overflow-hidden w-full h-full bg-background rounded-2xl shadow-xl flex items-center justify-center min-h-[400px] h-transition hover-lift">
+
+              <div id="problem-preview-fallback" class="text-center transition-opacity duration-200">
+                <!-- 동그란 아이콘 자리: IMG 기본 표시(+SVG는 숨김 가능) -->
+                <div id="problem-icon-circle"
+                    class="w-48 h-48 md:w-56 md:h-56 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 relative overflow-hidden">
+
+                  <!-- 기본 PNG 표시 -->
+                  <img id="problem-icon-img"
+                       class="absolute inset-0 w-full h-full object-contain rounded-full opacity-100 transition-opacity duration-300"
+                       src="source/problem/final/1-removebg-preview.png"
+                       alt="Problem icon preview">
+                  <!-- 필요 시 기본 SVG (지금은 가려둠) -->
+                  <svg id="problem-icon-svg" xmlns="http://www.w3.org/2000/svg" width="48" height="48"
+                       viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                       class="text-primary relative z-[1]" style="opacity:0">
+                    <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20z"/>
+                    <path d="M2 12h20"/>
+                    <path d="M12 2a14.5 14.5 0 0 1 0 20 14.5 14.5 0 0 1 0-20z"/>
+                  </svg>
+                </div>
+                <!-- 아래 라벨 텍스트: 카드별로 바뀜 -->
+                <p id="problem-icon-label" class="text-muted-foreground">성장을 가로막는 것들</p>
+              </div>
+
+            </div>
+          </div>
+        </div>
+        <!-- /오른쪽 프리뷰 카드 -->
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="features" class="h-200vh relative">
+  <div class="sticky-content">
+    <div class="max-w-7xl mx-auto px-6 w-full">
+      <div class="text-center mb-16 animate-on-scroll slide-in-up">
+        <h2 class="text-5xl font-serif font-bold mb-6">단순한 강의가 아닌,<br>당신과 함께 성장하는 AI 코치</h2>
+        <p class="text-xl text-muted-foreground max-w-3xl mx-auto">SkillMorph는 개인 맞춤형 성장 관리로 진짜 '내 것'이 되는 역량을 만들어 드립니다.</p>
+      </div>
+
+      <!-- 카드 3개 -->
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="bg-background border border-border rounded-lg p-8 animate-on-scroll slide-in-left delay-1 h-transition hover-gradient-fill-yellow">
+          <div class="w-16 h-16 bg-accent/10 rounded-xl flex items-center justify-center mb-6">
+            <!-- 아이콘 -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-accent"><path d="M2 12h20"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20z"/></svg>
+          </div>
+          <h3 class="text-2xl font-semibold mb-4">나만의 성장 지도</h3>
+          <p class="leading-relaxed">성장 그래프를 통해 나의 스킬 레벨이 올라가는 것을 직접 확인하고 동기를 부여받으세요.</p>
+        </div>
+
+        <div class="bg-background border border-border rounded-lg p-8 animate-on-scroll zoom-in delay-2 h-transition hover-gradient-fill-yellow">
+          <div class="w-16 h-16 bg-accent/10 rounded-xl flex items-center justify-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-accent"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <h3 class="text-2xl font-semibold mb-4">진짜 '내 것'이 되는 경험</h3>
+          <p class="leading-relaxed"> 직무, 목표, 현재 역량을 분석해 AI 멘토가 매주 달성 가능한 '스킬 퀘스트'를 제안합니다.</p>
+        </div>
+
+        <div class="bg-background border border-border rounded-lg p-8 animate-on-scroll slide-in-right delay-3 h-transition hover-gradient-fill-yellow">
+          <div class="w-16 h-16 bg-accent/10 rounded-xl flex items-center justify-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-accent"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+          </div>
+          <h3 class="text-2xl font-semibold mb-4">눈으로 확인하는 나의 성장</h3>
+          <p class="leading-relaxed">실무 결과물을 업로드하면 AI 멘토가 사수처럼 꼼꼼하게 피드백을 제공합니다.</p>
+        </div>
+      </div>
+
+      <!-- ✅ 프리뷰 패널: 카드 그리드 바로 아래에 추가 -->
+      <div id="feature-demo" class="feature-demo-panel mt-12">
+        <div class="feature-demo-header">
+          <span id="feature-demo-title">Feature Preview</span>
+        </div>
+        <div id="feature-demo-stage" class="feature-demo-stage"></div>
+      </div>
+      <!-- ✅ 여기까지가 features 섹션 내부 -->
+
+    </div>
+  </div>
+</section>
+
+
+
+<section id="process" class="h-200vh relative bg-card">
+    <div class="sticky-content">
+       <div class="max-w-7xl mx-auto px-6 w-full">
+           <div class="text-center mb-16 animate-on-scroll slide-in-up"><h2 class="text-5xl font-serif font-bold mb-6 text-card-foreground">단 3단계면, 당신의 성장이 시작됩니다.</h2></div>
+           <div class="relative">
+               <div class="grid md:grid-cols-3 gap-8">
+                   <div class="relative text-center animate-on-scroll slide-in-up delay-1 h-transition hover-step-highlight">
+                       <div class="step-circle relative z-10 w-16 h-16 mx-auto bg-primary rounded-full flex items-center justify-center"><span class="text-2xl font-serif font-bold text-primary-foreground">1</span></div>
+                       <div class="mt-4"><h3 class="text-xl font-semibold mb-2 text-card-foreground">목표 설정 (1분)</h3><p class="text-muted-foreground text-lg">현재 직무와 성장 목표를 입력하여 AI에게 당신을 알려주세요.</p></div>
+                   </div>
+                   <div class="relative text-center animate-on-scroll slide-in-up delay-2 h-transition hover-step-highlight">
+                       <div class="step-circle relative z-10 w-16 h-16 mx-auto bg-primary rounded-full flex items-center justify-center"><span class="text-2xl font-serif font-bold text-primary-foreground">2</span></div>
+                       <div class="mt-4"><h3 class="text-xl font-semibold mb-2 text-card-foreground">AI 플랜 추천</h3><p class="text-muted-foreground text-lg">AI가 당신에게 꼭 맞는 주 단위 성장 플랜과 '스킬 퀘스트'를 제안합니다.</p></div>
+                   </div>
+                   <div class="relative text-center animate-on-scroll slide-in-up delay-3 h-transition hover-step-highlight">
+                       <div class="step-circle relative z-10 w-16 h-16 mx-auto bg-primary rounded-full flex items-center justify-center"><span class="text-2xl font-serif font-bold text-primary-foreground">3</span></div>
+                       <div class="mt-4"><h3 class="text-xl font-semibold mb-2 text-card-foreground">실행 및 피드백</h3><p class="text-muted-foreground text-lg">퀘스트를 수행하고 AI 멘토의 피드백을 통해 역량을 완성하세요.</p></div>
+                   </div>
+               </div>
+           </div>
+       </div>
+   </div>
+</section>
+            
+
+                        <section id="demo" class="h-200vh relative bg-card">
+                <div class="sticky-content px-6">
+                    <div class="text-center mb-10 animate-on-scroll slide-in-up">
+                        <h2 class="text-5xl font-serif font-bold mb-6 text-card-foreground">SkillMorph 미리보기</h2>
+                        <p class="text-xl text-muted-foreground max-w-3xl mx-auto">실제 대시보드 환경을 간소화하여 핵심 기능을 체험해보세요.</p>
+                         <a href="https://skillmorph.dothome.co.kr/skillmorph/skillmorph_gemini.html" 
+               target="_blank" 
+               rel="noopener noreferrer" 
+               class="inline-flex items-center justify-center rounded-md text-sm font-medium h-11 px-8 py-3 bg-primary text-primary-foreground hover:bg-primary/90 h-transition hover-scale mt-8">
+               바로 가기
+            </a>
+                    </div>
+                    <div class="demo-container animate-on-scroll zoom-in delay-1">
+                        <div class="tabs">
+                            <button class="tab active" onclick="switchDemoView('dashboard', this)">Dashboard</button>
+                            <button class="tab" onclick="switchDemoView('plan', this)">Plan</button>
+                            <button class="tab" onclick="switchDemoView('quests', this)">Quests</button>
+                        </div>
+                        <div id="demo-dashboard" class="view active">
+                            <div class="grid cols-3">
+                                <div class="card">
+                                    <h3>현재 스킬 점수</h3>
+                                    <div class="kpi">
+                                        <div>
+                                            <div class="muted">주간 변화</div>
+                                            <div style="font-size:28px; font-weight:900;">+4.2</div>
+                                            <div class="muted" style="margin-top:4px;">지난주 대비 향상</div>
+                                        </div>
+                                        <div class="ring" style="--p:76"><span>76%</span></div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <h3>활성 퀘스트</h3>
+                                    <div class="list">
+                                        <div class="row"><div>파이썬으로 리포트 자동화</div><span class="pill">D-3</span></div>
+                                        <div class="row"><div>5분 스탠드업 발표</div><span class="pill">D-1</span></div>
+                                        <div class="row"><div>1:1 코칭 노트 작성</div><span class="pill">이번주</span></div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <h3>이번주 활동</h3>
+                                    <div class="bars">
+                                        <div class="bar" style="height:30%"></div><div class="bar" style="height:65%"></div><div class="bar" style="height:90%"></div>
+                                        <div class="bar" style="height:55%"></div><div class="bar" style="height:70%"></div><div class="bar" style="height:35%"></div>
+                                        <div class="bar" style="height:20%"></div>
+                                    </div>
+                                    <div class="muted" style="text-align:right; font-size:12px; margin-top:4px;">월~일</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="demo-plan" class="view">
+                            <div class="card">
+                                <h3>주간 성장 플랜 (8/18–8/24)</h3>
+                                <div class="list">
+                                    <div class="row"><span>파이썬으로 매출 리포트 자동화</span><span class="pill">분석</span></div>
+                                    <div class="row"><span>5분 스탠드업 발표 스크립트 작성</span><span class="pill">커뮤니케이션</span></div>
+                                    <div class="row"><span>1:1 코칭 질문 리스트 생성</span><span class="pill">리더십</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="demo-quests" class="view">
+                            <div class="card">
+                                <h3>퀘스트 카탈로그</h3>
+                                <div class="list">
+                                    <div class="row">
+                                        <div><span class="pill">분석·초급</span> SQL로 리텐션 코호트 만들기</div>
+                                        <button class="btn" data-title="SQL로 리텐션 코호트 만들기" data-goal="SQL로 리텐션 코호트 분석 테이블을 만들고, 주별 유지율을 시각화합니다." data-details="예상 소요: 3시간 / 난이도: 중" onclick="openDemoQuest(this)">시작</button>
+                                    </div>
+                                    <div class="row">
+                                        <div><span class="pill">코딩·중급</span> A/B Test 트래킹 이벤트 설계</div>
+                                        <button class="btn" data-title="A/B Test 트래킹 이벤트 설계" data-goal="새로운 기능의 A/B 테스트를 위한 사용자 행동 추적 이벤트를 설계하고 명세서를 작성합니다." data-details="예상 소요: 5시간 / 난이도: 중" onclick="openDemoQuest(this)">시작</button>
+                                    </div>
+                                    <div class="row">
+                                        <div><span class="pill">커뮤니케이션·초급</span> 2장 프레젠테이션 쓰기</div>
+                                        <button class="btn" data-title="2장 프레젠테이션 쓰기" data-goal="핵심 지표와 분석 결과를 담아, 의사결정을 이끌어내는 2장짜리 요약 프레젠테이션을 작성합니다." data-details="예상 소요: 2시간 / 난이도: 초급" onclick="openDemoQuest(this)">시작</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>            
+            </section>
+
+<section id="for-who" class="h-200vh relative">
+    <div class="sticky-content">
+        <div class="max-w-7xl mx-auto px-6 w-full">
+            <div class="text-center mb-16 animate-on-scroll slide-in-up">
+                <h2 class="text-5xl font-serif font-bold mb-6">SkillMorph는 이런 분들을 위한<br>최고의 툴입니다.</h2>
+            </div>
+             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="p-8 bg-background border border-border rounded-lg text-center animate-on-scroll slide-in-up delay-1 h-transition hover-gradient-fill">
+                    <h3 class="text-2xl font-semibold mb-3">이직/취업 준비생</h3>
+                    <p class="leading-relaxed">체계적인 포트폴리오와 실무 역량을 쌓고 싶으신 분</p>
+                    <div class="footer-icon">💼</div>
+                </div>
+                <div class="p-8 bg-background border border-border rounded-lg text-center animate-on-scroll slide-in-up delay-2 h-transition hover-gradient-fill">
+                    <h3 class="text-2xl font-semibold mb-3">1~4년차 주니어</h3>
+                    <p class="leading-relaxed">사수 없이 성장해야 하는 막막함을 느끼는 분</p>
+                    <div class="footer-icon">🌱</div>
+                </div>
+                <div class="p-8 bg-background border border-border rounded-lg text-center animate-on-scroll slide-in-up delay-3 h-transition hover-gradient-fill">
+                    <h3 class="text-2xl font-semibold mb-3">신규 직무 담당자</h3>
+                    <p class="leading-relaxed">새로운 분야의 스킬을 빠르게 습득해야 하는 분</p>
+                    <div class="footer-icon">🚀</div>
+                </div>
+                <div class="p-8 bg-background border border-border rounded-lg text-center animate-on-scroll slide-in-up delay-4 h-transition hover-gradient-fill">
+                    <h3 class="text-2xl font-semibold mb-3">성장 욕구가 강한 분</h3>
+                    <p class="leading-relaxed">정체되지 않고 계속 발전하고 싶은 모든 분</p>
+                    <div class="footer-icon">⭐</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section id="pricing" class="h-200vh relative bg-card">
+    <div class="sticky-content">
+        <div class="max-w-5xl mx-auto px-6 w-full">
+            <div class="text-center mb-16 animate-on-scroll slide-in-up">
+                <h2 class="text-5xl font-serif font-bold mb-6 text-card-foreground">가장 확실한 성장에<br>합리적으로 투자하세요.</h2>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8 items-stretch">
+                <div class="p-8 border-2 border-primary rounded-lg flex flex-col animate-on-scroll slide-in-left delay-1 h-transition hover-pricing-card">
+                    <h3 class="text-3xl font-serif font-bold mb-2">개인 구독</h3>
+                    <p class="mb-6">개인의 압도적인 성장을 위해</p>
+                    <div class="my-4 text-center"><span class="text-5xl font-bold font-serif">$14.9</span><span>/월</span></div>
+                    <ul class="space-y-3 my-8 text-left flex-grow">
+                        <li class="flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>개인 맞춤 성장 플랜</span></li>
+                        <li class="flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>AI 멘토링 무제한</span></li>
+                        <li class="flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>성장 그래프 시각화</span></li>
+                    </ul>
+                    <button onclick="showToast()" class="w-full mt-auto inline-flex items-center justify-center rounded-md text-sm font-medium h-11 px-8 py-3 bg-primary text-primary-foreground">첫 달 50% 할인받기</button>
+                </div>
+                <div class="p-8 bg-background border border-border rounded-lg flex flex-col animate-on-scroll slide-in-right delay-2 h-transition hover-lift">
+                    <h3 class="text-3xl font-serif font-bold mb-2">기업 교육 패키지</h3>
+                    <p class="text-muted-foreground mb-6">팀의 성장을 위한 맞춤 솔루션</p>
+                    <div class="my-4 text-center"><span class="text-3xl font-bold font-serif">별도 문의</span></div>
+                    <ul class="space-y-3 my-8 text-left flex-grow">
+                        <li class="flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>개인 구독 모든 기능 포함</span></li>
+                        <li class="flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>직원 관리 대시보드</span></li>
+                        <li class="flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>맞춤형 교육 설계 및 팀별 리포트</span></li>
+                    </ul>
+                    <button onclick="showToast()" class="w-full mt-auto inline-flex items-center justify-center rounded-md text-sm font-medium border h-11 px-8 py-3 bg-transparent border-border">도입 문의하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="final-cta" class="h-200vh relative">
+    <div class="sticky-content">
+        <div class="max-w-4xl mx-auto px-6 text-center animate-on-scroll zoom-in">
+            <div class="bg-gradient-to-r from-primary to-secondary rounded-3xl p-12 text-primary-foreground">
+                <h2 class="text-4xl font-serif font-bold mb-6">AI 멘토와 함께,<br>어제보다 나은 나를 만나보세요.</h2>
+                <p class="text-primary-foreground/80 text-lg mb-8 max-w-2xl mx-auto">지금 시작하면 당신의 1년 뒤 커리어가 달라집니다.</p>
+                <button onclick="showToast()"  class="inline-flex items-center justify-center rounded-md text-sm font-medium h-11 px-8 py-3 bg-background text-primary hover:bg-background/90 font-bold h-transition hover-press">무료로 시작하고 내 성장 플랜 받기<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="ml-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <div id="demo-modal" class="modal" role="dialog">
+        <div class="dialog">
+            <header id="modal-title">퀘스트 시작하기</header>
+            <main id="modal-content"></main>
+            <footer>
+                <button class="btn ghost" onclick="closeDemoQuest()">취소</button>
+                <button class="btn" onclick="closeDemoQuest()">추가하기</button>
+            </footer>
+        </div>
+    </div>
+
+    <div id="toast-popup">해당 페이지는 데모용 사이트입니다.</div>
+
+
+   
+
+<script>
+    // ===== Demo Section Script =====
+    function switchDemoView(id, btn) {
+        document.querySelectorAll('#demo .view').forEach(v => v.classList.remove('active'));
+        document.getElementById('demo-' + id).classList.add('active');
+        
+        document.querySelectorAll('#demo .tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    function openDemoQuest(button) {
+        const title = button.dataset.title;
+        const goal = button.dataset.goal;
+        const details = button.dataset.details;
+
+        const modalTitle = document.getElementById('modal-title');
+        const modalContent = document.getElementById('modal-content');
+        
+        modalTitle.textContent = title;
+        modalContent.innerHTML = `
+            <p><strong>목표:</strong> ${goal}</p>
+            <p><strong>${details}</strong></p>
+        `;
+        
+        document.getElementById('demo-modal').style.display = 'flex';
+    }
+
+    function closeDemoQuest() {
+        document.getElementById('demo-modal').style.display = 'none';
+    }
+    // ===== Scroll Animation Script (최종 수정본) =====
+    document.addEventListener("DOMContentLoaded", () => {
+        const sectionsToAnimate = document.querySelectorAll('#problem, #features, #process, #demo, #for-who, #pricing, #final-cta');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const stickyContent = entry.target.querySelector('.sticky-content');
+                if (!stickyContent) return;
+                
+                // --- 기존 애니메이션 로직 ---
+                if (entry.target.id === 'final-cta') {
+                    if (entry.isIntersecting) {
+                        stickyContent.classList.add('is-visible');
+                    } else {
+                        if (entry.boundingClientRect.top > 0) {
+                            stickyContent.classList.remove('is-visible');
+                        }
+                    }
+                } else {
+                    if (entry.isIntersecting) {
+                        stickyContent.classList.add('is-visible');
+                    } else {
+                        stickyContent.classList.remove('is-visible');
+                    }
+                }
+
+               // --- ★★★ 색상 반전 로직 (problem + for-who) ★★★
+if (entry.target.id === 'problem' || entry.target.id === 'for-who') {
+  entry.target.classList.toggle('section-inverted', entry.isIntersecting);
+  // :has() 미지원 브라우저 대비(옵션): 네비도 함께 토글하고 싶다면 아래 한 줄 유지
+  document.body.classList.toggle('invert-active', entry.isIntersecting);
+}
+            });
+        }, {
+            threshold: 0.2 // 섹션의 40%가 보일 때 동작
+        });
+
+        sectionsToAnimate.forEach(section => {
+            observer.observe(section);
+        });
+    });
+
+
+
+     // ===== Parallax Effect Script START (새로 추가) =====
+    document.addEventListener("scroll", () => {
+        const parallaxBg = document.getElementById('parallax-bg');
+        if (parallaxBg) {
+            // window.scrollY는 현재 스크롤된 Y축의 위치입니다.
+            const scrollY = window.scrollY;
+
+            // 0.5를 곱해서 스크롤 속도의 절반으로 움직이게 합니다.
+            // 이 값을 0.3으로 바꾸면 더 느리게, 0.7로 바꾸면 더 빠르게 움직입니다.
+            parallaxBg.style.transform = `translateY(${scrollY * 0.5}px)`;
+        }
+    });
+    // ===== Parallax Effect Script END =====
+
+
+    // ===== Toast Popup Script =====
+function showToast() {
+    const toast = document.getElementById('toast-popup');
+    toast.classList.add('show');
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000); // 3초 후에 사라집니다.
+}
+
+
+// ===== Nav Active & Typing Animation Script START =====
+document.addEventListener("DOMContentLoaded", () => {
+    // --- 1. Nav 링크 활성화 기능 ---
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    const observerOptions = {
+        rootMargin: '-40% 0px -60% 0px' // 화면의 중앙 20% 영역을 기준으로 감지
+    };
+
+    const sectionObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const id = entry.target.getAttribute('id');
+                // 기존 nav-link 쿼리를 함수 스코프 안으로 이동
+                const navLinksInScope = document.querySelectorAll('nav .nav-link');
+                navLinksInScope.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${id}`) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        });
+    }, observerOptions);
+
+    sections.forEach(section => {
+        sectionObserver.observe(section);
+    });
+
+    // --- 2. Hero 섹션 타이핑 애니메이션 ---
+const subtitleElement = document.getElementById('typing-subtitle');
+const textToType = "정체된 커리어가 고민인가요?<br>AI 멘토가 당신만을 위한 맞춤 성장 로드맵을 제시합니다.";
+let index = 0;
+
+function type() {
+    if(!subtitleElement) return; // 요소가 없으면 실행 중지
+    // textToType에서 '<br>' 태그를 만났는지 확인
+    if (textToType.substring(index, index + 4) === '<br>') {
+        subtitleElement.innerHTML += '<br>';
+        index += 4; // '<br>' 태그 길이(4)만큼 인덱스를 건너뜁니다.
+    } else {
+        subtitleElement.innerHTML += textToType.charAt(index);
+        index++;
+    }
+
+    if (index < textToType.length) {
+        setTimeout(type, 50); // 타이핑 속도 (ms)
+    }
+}
+    
+    // 페이지 로드 후 잠시 뒤에 타이핑 시작
+    setTimeout(type, 500);
+});
+// ===== Nav Active & Typing Animation Script END =====
+
+(function(){
+  const overlay = document.querySelector('.mask-overlay');
+  const trigger = document.getElementById('reveal-mask');
+    const nav     = document.querySelector('nav'); // ⬅️ 추가
+
+
+  const R_START = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--r-start')) || 120;
+  const R_END   = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--r-end'))   || 560;
+  const ALPHA_MAX = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--alpha-max')) || 0.86;
+
+  const FADE_START = 0.35;
+  const FADE_END   = 0.4;
+
+ // ⬇️ 히스테리시스(켜기/끄기 임계값 분리)
+  const INVERT_ON  = 0.08; // alpha가 이 값 '초과'면 invert ON (더 일찍 켜고 싶으면 ↑)
+  const INVERT_OFF = 0.8; // alpha가 이 값 '미만'이면 invert OFF (더 늦게 끄고 싶으면 ↓)
+  let navInverted = false;
+
+
+  function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+
+  function update(){
+    const rect = trigger.getBoundingClientRect();
+    const vh   = window.innerHeight || 1;
+
+    const total = rect.height + vh;
+    const passed = vh - rect.top;
+    let t = passed / total;
+    t = clamp(t, 0, 1);
+
+    // 스크롤 기반 기본 반경
+const rBase = R_START + (R_END - R_START) * t;
+
+// 호흡감(± px)
+const tsec = performance.now() / 1000;
+const BREATH_AMPL  = 15;    // 진폭(px) 4~10 권장
+const BREATH_SPEED = 0.3;  // 속도(Hz 유사) 0.8~1.5 권장
+
+// 모션 민감 사용자 배려
+const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const wobble = reduce ? 0 : BREATH_AMPL * Math.sin(tsec * BREATH_SPEED * 2 * Math.PI);
+
+// 최종 반경 = 스크롤 + 호흡
+overlay.style.setProperty('--r', (rBase + wobble).toFixed(2));
+
+
+    let alpha = ALPHA_MAX;
+    if (t >= FADE_START){
+      const u = clamp((t - FADE_START) / (FADE_END - FADE_START), 0, 1);
+      alpha = ALPHA_MAX * (1 - u);
+    }
+    overlay.style.setProperty('--alpha', alpha.toFixed(3));
+
+    overlay.style.opacity = (alpha <= 0.01) ? 0 : 1;
+
+ // ⬇️ 마스크가 살아있을 때만 nav 반전
+    if (nav) nav.classList.toggle('invert-nav', alpha > 0.08);
+
+    requestAnimationFrame(update);
+  }
+   
+  update();
+})();
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const problem = document.getElementById('problem');
+  const nav     = document.querySelector('nav');
+  if (!problem) return;
+
+  const NAV_H = (nav?.offsetHeight || 0) + 4;
+
+  // 🔧 “조금만 늦추기” 노브 (px 단위)
+  // 16~40 사이에서 취향대로 조절해보세요. 숫자 ↑ = 더 늦게 켜짐.
+  const OFFSET_PX = 24;
+
+  // 🔁 원한다면 px 대신 화면 높이 비율로도 가능 (예: 6% 늦추기)
+  // const OFFSET_PX = Math.round(window.innerHeight * 0.06);
+
+  function syncInvert() {
+    const r = problem.getBoundingClientRect();
+
+    // 기준선을 더 아래로 내리기: NAV_H - OFFSET_PX
+    const thresholdY = Math.max(0, NAV_H - OFFSET_PX);
+
+    const shouldActivate = (r.top <= thresholdY) && (r.bottom > thresholdY);
+
+    problem.classList.toggle('section-inverted', shouldActivate);
+    document.body.classList.toggle('invert-active', shouldActivate);
+  }
+
+  syncInvert();
+  window.addEventListener('scroll', () => requestAnimationFrame(syncInvert), { passive: true });
+  window.addEventListener('resize', () => requestAnimationFrame(syncInvert));
+});
+document.addEventListener("DOMContentLoaded", () => {
+  // 기본 PNG (항상 보일 기본 상태)
+  const DEFAULT_SRC = "source/problem/final/1-removebg-preview.png";
+
+  const cards    = document.querySelectorAll("#problem .problem-card");
+  const imgEl    = document.getElementById("problem-icon-img");
+  const svgEl    = document.getElementById("problem-icon-svg");
+  const labelEl  = document.getElementById("problem-icon-label");
+  const leftCol  = document.getElementById("problem-card-col");
+  const preview  = document.getElementById("problem-preview");
+
+  if (!imgEl || !svgEl || !labelEl) return;
+
+  // 깜빡임 방지: 1~5번 PNG 미리 불러오기
+  ["1","2","3","4","5"].forEach(n => {
+    const im = new Image();
+    im.src = `source/problem/final/${n}-removebg-preview.png`;
+  });
+
+  const DEFAULT_LABEL = labelEl.textContent || "성장을 가로막는 것들";
+
+  function setIcon(src, label){
+    if (src && imgEl.src !== src) imgEl.src = src;
+    // IMG는 항상 보이게
+    imgEl.classList.remove("opacity-0");
+    imgEl.classList.add("opacity-100");
+    // SVG는 가려둠
+    svgEl.style.opacity = 0;
+    if (label) labelEl.textContent = label;
+  }
+
+  // 기본 상태 = 1번 PNG로 세팅
+  function resetIcon(){
+    setIcon(DEFAULT_SRC, DEFAULT_LABEL);
+  }
+  resetIcon();
+
+  // 카드 호버/포커스 → 해당 PNG로 교체
+  cards.forEach(card => {
+    const src  = card.getAttribute("data-icon-img");
+    const text = card.getAttribute("data-label") || card.querySelector("h3")?.textContent?.trim();
+    if (!src) return;
+    card.addEventListener("mouseenter", () => setIcon(src, text));
+    card.addEventListener("focusin",   () => setIcon(src, text));
+  });
+
+  // 카드 영역/프리뷰에서 벗어나면 기본 PNG로 복귀
+  [leftCol, preview].forEach(el => {
+    el?.addEventListener("mouseleave", resetIcon, { passive:true });
+  });
+  leftCol?.addEventListener("focusout", (e) => {
+    if (!leftCol.contains(e.relatedTarget)) resetIcon();
+  });
+});
+
+// feature 섹션: 스크롤 자동호버 + 고정 높이 + 자동 애니메이션(클릭 없이 연출)
+document.addEventListener("DOMContentLoaded", () => {
+  const features = document.getElementById('features');
+  if (!features) return;
+
+  const cards = features.querySelectorAll('.grid .hover-gradient-fill-yellow');
+  const stage = document.getElementById('feature-demo-stage');
+  const title = document.getElementById('feature-demo-title');
+  if (!cards.length || !stage) return;
+
+  let autoMode = true;
+  const TEMPLATE_IDS = ['tpl-feature-0','tpl-feature-1','tpl-feature-2'];
+
+  /* 진행도 0~1 (섹션 스크롤 비율) */
+  function progressInSection(sectionEl) {
+    const rect = sectionEl.getBoundingClientRect();
+    const vh = window.innerHeight || 1;
+    const total = rect.height + vh;
+    const passed = vh - rect.top;
+    return Math.max(0, Math.min(1, passed / total));
+  }
+
+  /* 템플릿 로드 + 템플릿별 자동 연출(사용자 클릭 없이) */
+  function showDemo(idx){
+    const tpl = document.getElementById(`tpl-feature-${idx}`);
+    if (!tpl) return;
+    stage.innerHTML = "";
+    stage.appendChild(tpl.content.cloneNode(true));
+
+    if (title) {
+      const h3 = cards[idx]?.querySelector('h3');
+      title.textContent = h3 ? h3.textContent.trim() : 'Feature Preview';
+    }
+
+    // 프리뷰 내부 요소는 실제 클릭/체크 비활성(호버 UX만 사용)
+    stage.querySelectorAll('button,input,select,a').forEach(el => { el.style.pointerEvents = 'none'; });
+
+    // 1번: Plan/Quests — 자동으로 체크 → 프로그레스 채움
+    if (idx === 1) {
+      playPlanAuto(stage);
+    }
+
+    // 2번: Mentors/Feedback — 자동으로 피드백 순차 등장
+    if (idx === 2) {
+      playMentorAuto(stage);
+    }
+  }
+
+  /* [진짜 '내 것'이 되는 경험] 자동 진행 연출 */
+  function playPlanAuto(root){
+    const todosRoot = root.querySelector('.js-todos');
+    const bar   = root.querySelector('.js-progress .bar');
+    const pctEl = root.querySelector('.js-progress .pct');
+    if (!todosRoot || !bar) return;
+
+    const boxes = [...todosRoot.querySelectorAll('input[type="checkbox"]')];
+
+    // 초기화
+    boxes.forEach(b => { b.checked = false; });
+    bar.style.transition = 'none';
+    bar.style.width = '0%';
+    // reflow
+    void bar.offsetWidth;
+    bar.style.transition = 'width .8s cubic-bezier(.2,.8,.2,1)';
+    if (pctEl) pctEl.textContent = '0%';
+
+    // 0% → 25% → 50% → 75% (클릭 없이 자동으로 체크된 것처럼)
+    const total = boxes.length || 4;
+    const steps = Math.min(total, 3);
+    for (let i = 0; i < steps; i++) {
+      setTimeout(() => {
+        if (boxes[i]) boxes[i].checked = true;
+        const pct = Math.round(((i+1)/total) * 100);
+        bar.style.width = pct + '%';
+        if (pctEl) pctEl.textContent = pct + '%';
+      }, 300 + i * 650);
+    }
+  }
+
+  /* [눈으로 확인하는 나의 성장] 자동 생성 연출 */
+  function playMentorAuto(root){
+    const rows = [...root.querySelectorAll('.js-feedback .row')];
+    const btn  = root.querySelector('.js-generate');
+    if (!rows.length) return;
+
+    // 초기 숨김
+    rows.forEach(r => r.classList.remove('show'));
+    if (btn) btn.textContent = '생성 중...';
+
+    // 순차 등장
+    rows.forEach((r, i) => {
+      setTimeout(() => r.classList.add('show'), 250 + i * 240);
+    });
+
+    // 버튼 텍스트 복구(연출용)
+    setTimeout(() => { if (btn) btn.textContent = '샘플 피드백 생성'; }, 250 + rows.length * 240 + 350);
+  }
+
+  /* 30%~70% 구간 자동 활성화 */
+  function activateByProgress(t) {
+    if (!autoMode) return;
+    if (t < 0.3 || t > 0.7) {
+      cards.forEach(el => el.classList.remove('is-active'));
+      return;
+    }
+    const localT = (t - 0.3) / 0.4; // 0~1
+    let idx = 0;
+    if (localT >= 2/3) idx = 2;
+    else if (localT >= 1/3) idx = 1;
+
+    cards.forEach((el, i) => el.classList.toggle('is-active', i === idx));
+    showDemo(idx);
+  }
+
+  function onScroll() {
+    const t = progressInSection(features);
+    activateByProgress(t);
+  }
+
+      window.addEventListener('scroll', onScroll);
+
+
+  // 마우스 hover → 자동 OFF, 해당 카드 표시
+  cards.forEach((card, i) => {
+    card.addEventListener('mouseenter', () => {
+      autoMode = false;
+      cards.forEach(el => el.classList.remove('is-active'));
+      card.classList.add('is-active');
+      showDemo(i);
+    });
+    card.addEventListener('mouseleave', () => {
+      autoMode = true;
+      onScroll();
+    });
+  });
+
+  
+
+/* ===== (교체) 오프스크린 측정은 버리고, 실제 stage 컨텍스트에서 측정 ===== */
+function lockStageHeight() {
+  const IDs = ['tpl-feature-0','tpl-feature-1','tpl-feature-2'];
+
+  const prevHTML = stage.innerHTML;
+  const prevVis  = stage.style.visibility;
+  const prevPE   = stage.style.pointerEvents;
+
+  stage.style.visibility    = 'hidden';
+  stage.style.pointerEvents = 'none';
+  stage.style.removeProperty('height'); // auto로 풀어둔 뒤 측정
+
+  let maxH = 0;
+  for (const id of IDs) {
+    const tpl = document.getElementById(id);
+    if (!tpl) continue;
+    stage.innerHTML = '';
+    const frag = tpl.content.cloneNode(true);
+
+    // (필요 시) 접히는 요소는 전개 상태로 측정
+    const fl = frag.querySelector('.feedback-list');
+    if (fl) fl.querySelectorAll('.row').forEach(r => r.classList.add('show'));
+
+    stage.appendChild(frag);
+    maxH = Math.max(maxH, stage.scrollHeight);
+  }
+
+  // 원상 복구 (초기 템플릿은 0번으로)
+  stage.innerHTML = '';
+  const first = document.getElementById(IDs[0]);
+  if (first) stage.appendChild(first.content.cloneNode(true));
+
+  // 픽셀 고정 + !important (CSS 충돌, 전역 transition 방어)
+  if (maxH > 0) stage.style.setProperty('height', maxH + 'px', 'important');
+
+  stage.style.visibility    = prevVis || '';
+  stage.style.pointerEvents = prevPE  || '';
+}
+
+let measuring = false;
+function safeLock() {
+  if (measuring) return;
+  measuring = true;
+  requestAnimationFrame(() => {
+    stage.style.removeProperty('height');
+    lockStageHeight();
+    measuring = false;
+  });
+}
+
+lockStageHeight();
+
+let rid;
+window.addEventListener('resize', () => {
+  cancelAnimationFrame(rid);
+  rid = requestAnimationFrame(safeLock);
+});
+
+/* ===== [UNIFY MVP BLOCK HEIGHTS] — 통째로 교체해서 쓰세요 ===== */
+const UNIFY_TARGETS = ['.mvp-snap', '.mvp-theme', '.anim-line', '.anim-sweep', '.anim-bars'];
+let uniformHeights = null;
+
+function computeUniformHeights() {
+  if (!stage) return null;
+
+  // 템플릿 ID 목록: 기존 TEMPLATE_IDS 있으면 사용, 없으면 0~2 기본값
+  const ids = (typeof TEMPLATE_IDS !== 'undefined' && TEMPLATE_IDS.length)
+    ? TEMPLATE_IDS
+    : ['tpl-feature-0','tpl-feature-1','tpl-feature-2'];
+
+  /* stage 상태 백업 */
+  const prevHTML = stage.innerHTML;
+  const prevVis  = stage.style.visibility;
+  const prevPE   = stage.style.pointerEvents;
+  const prevH    = stage.style.height;
+  const prevTr   = stage.style.transition;
+
+  /* 측정 준비(깜빡임/간섭 방지) */
+  stage.style.visibility    = 'hidden';
+  stage.style.pointerEvents = 'none';
+  stage.style.transition    = 'none';
+  stage.style.height        = '';       // auto로 풀어서 실제 높이 계측
+
+  const acc = Object.fromEntries(UNIFY_TARGETS.map(sel => [sel, 0]));
+
+  // 각 템플릿을 실제 stage에 렌더해가며 대상들의 최대 높이 수집
+  ids.forEach(id => {
+    const tpl = document.getElementById(id);
+    if (!tpl) return;
+
+    stage.innerHTML = '';
+    const frag = tpl.content ? tpl.content.cloneNode(true) : tpl.cloneNode(true);
+
+    // 접힘 요소가 있으면 전개 상태로 측정(필요 시)
+    const fl = frag.querySelector('.feedback-list');
+    if (fl) fl.querySelectorAll('.row').forEach(r => r.classList.add('show'));
+
+    stage.appendChild(frag);
+
+    UNIFY_TARGETS.forEach(sel => {
+      stage.querySelectorAll(sel).forEach(el => {
+        const h = Math.ceil(el.getBoundingClientRect().height || el.offsetHeight || 0);
+        if (h > acc[sel]) acc[sel] = h;
+      });
+    });
+  });
+
+  /* 원복 */
+  stage.innerHTML         = prevHTML;
+  stage.style.visibility  = prevVis || '';
+  stage.style.pointerEvents = prevPE || '';
+  stage.style.transition  = prevTr || '';
+  stage.style.height      = prevH || '';
+
+  return acc;
+}
+
+function applyUniformHeights(root) {
+  if (!uniformHeights || !root) return;
+  for (const [sel, h] of Object.entries(uniformHeights)) {
+    if (!h) continue;
+    root.querySelectorAll(sel).forEach(el => {
+      // 동일 높이 강제(충돌 방지 위해 !important)
+      el.style.setProperty('height',     h + 'px', 'important');
+      el.style.setProperty('min-height', h + 'px', 'important');
+    });
+  }
+}
+
+/* 초기 1회: 계산 → 적용 */
+uniformHeights = computeUniformHeights();
+applyUniformHeights(stage);
+
+/* showDemo 후킹: 템플릿 바뀔 때마다 즉시 적용 */
+const __origShowDemo = typeof showDemo === 'function' ? showDemo : null;
+if (__origShowDemo) {
+  showDemo = function(idx){
+    __origShowDemo(idx);
+    if (!uniformHeights) uniformHeights = computeUniformHeights();
+    applyUniformHeights(stage);
+  };
+}
+
+/* 리사이즈 / 웹폰트 적용 후 재계산 */
+let unifyRaf;
+window.addEventListener('resize', () => {
+  cancelAnimationFrame(unifyRaf);
+  unifyRaf = requestAnimationFrame(() => {
+    uniformHeights = computeUniformHeights();
+    applyUniformHeights(stage);
+  });
+});
+
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(() => {
+    uniformHeights = computeUniformHeights();
+    applyUniformHeights(stage);
+  });
+}
+
+
+});
+
+// ===== For-Who 섹션 자동 호버 스크립트 (새로 추가) =====
+document.addEventListener("DOMContentLoaded", () => {
+    // 1. 필요한 요소들을 가져옵니다.
+    const forWhoSection = document.getElementById('for-who');
+    if (!forWhoSection) return;
+
+    const forWhoCards = forWhoSection.querySelectorAll('.grid .hover-gradient-fill');
+    let forWhoAutoMode = true;
+
+    // (공통 함수) 스크롤 진행률 계산
+    function progressInSection(sectionEl) {
+        const rect = sectionEl.getBoundingClientRect();
+        const vh = window.innerHeight || 1;
+        const total = rect.height + vh;
+        const passed = vh - rect.top;
+        return Math.max(0, Math.min(1, passed / total));
+    }
+
+    // 2. 스크롤 진행률에 따라 카드를 활성화하는 함수
+    function activateForWhoByProgress(t) {
+        if (!forWhoAutoMode) return;
+
+        // for-who 섹션도 200vh이므로 30% ~ 70% 구간을 사용합니다.
+        if (t < 0.3 || t > 0.7) {
+            forWhoCards.forEach(el => el.classList.remove('is-active'));
+            return;
+        }
+        
+        const localT = (t - 0.3) / 0.4; // 진행률을 0~1 사이 값으로 정규화
+
+        // ★★★ 카드가 4개이므로 인덱스 계산 방식을 수정합니다. ★★★
+        const idx = Math.min(3, Math.floor(localT * 4));
+
+        // 활성화된 카드에 is-active 클래스를 추가/제거합니다.
+        forWhoCards.forEach((el, i) => {
+            el.classList.toggle('is-active', i === idx)
+        });
+    }
+
+    // 3. 스크롤 이벤트를 감지하는 함수
+    function onForWhoScroll() {
+        const t = progressInSection(forWhoSection);
+        activateForWhoByProgress(t);
+    }
+
+    // 4. 스크롤 이벤트 리스너를 연결합니다.
+    window.addEventListener('scroll', onForWhoScroll);
+
+    // 5. 마우스 호버 시 자동 기능을 끄고 켭니다.
+    forWhoCards.forEach((card, i) => {
+        card.addEventListener('mouseenter', () => {
+            forWhoAutoMode = false;
+            forWhoCards.forEach(el => el.classList.remove('is-active'));
+            card.classList.add('is-active');
+        });
+        card.addEventListener('mouseleave', () => {
+            forWhoAutoMode = true;
+            onForWhoScroll(); // 마우스가 떠나면 다시 스크롤 위치에 맞는 카드를 활성화
+        });
+    });
+});
+
+// ===== 동적 레이아웃 전환 스크립트 (콘텐츠 높이 기반) =====
+document.addEventListener("DOMContentLoaded", () => {
+    
+    // 성능 최적화를 위한 debounce 함수
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    // 레이아웃을 업데이트하는 메인 함수
+    function updateLayouts() {
+        const sections = document.querySelectorAll('.h-200vh');
+        const viewportHeight = window.innerHeight;
+
+        sections.forEach(section => {
+            // .sticky-content 바로 안쪽의 실제 콘텐츠 컨테이너를 찾습니다.
+            const contentWrapper = section.querySelector('.sticky-content > div');
+            if (!contentWrapper) return;
+
+            // 실제 콘텐츠의 높이를 측정합니다.
+            const contentHeight = contentWrapper.offsetHeight;
+            
+            // 콘텐츠 높이가 화면 높이보다 크면 'layout-static' 클래스를 추가하고,
+            // 그렇지 않으면 제거합니다.
+            if (contentHeight > viewportHeight) {
+                section.classList.add('layout-static');
+            } else {
+                section.classList.remove('layout-static');
+            }
+        });
+    }
+
+    // 페이지가 처음 로드될 때 한 번 실행
+    updateLayouts();
+
+    // 브라우저 창 크기가 변경될 때마다 (debounce 적용하여) 실행
+    window.addEventListener('resize', debounce(updateLayouts, 200));
+});
+
+</script>
+
+<template id="tpl-feature-0">
+  <style>
+    .mvp-theme{ --text:#f2f6ff; --muted:#cbd5e1; --border:rgba(255,255,255,.18); }
+    .mvp-theme, .mvp-theme *{ color:var(--text); } .mvp-theme .muted{ color:var(--muted); }
+
+    /* 여기를 줄여달란 요청: hero만 낮춤 (나머지는 자동 높이) */
+    .mvp-hero{ padding:12px; }
+    .mvp-orb{ 
+  height: 50px; /* 140px에서 100px로 수정 */
+  border:1px solid var(--border); 
+  border-radius:18px; 
+  position:relative; 
+  overflow:hidden;
+  background:linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.02)); 
+  backdrop-filter:blur(8px) saturate(120%); 
+}
+    .orb-bg{ position:absolute; inset:-30%; background:
+      radial-gradient(closest-side at 15% 30%, rgba(72,187,255,.35), transparent 60%),
+      radial-gradient(closest-side at 85% 20%, rgba(102,126,234,.35), transparent 60%); }
+    .orb-grid{ position:absolute; inset:0; opacity:.6;
+      background:linear-gradient(to right, rgba(255,255,255,.08) 1px, transparent 1px) 0 0/ 34px 34px,
+                linear-gradient(to bottom, rgba(255,255,255,.06) 1px, transparent 1px) 0 0/ 34px 34px; }
+    .orb-sweep{ position:absolute; inset:-20%; background:linear-gradient(75deg, transparent 40%, rgba(255,255,255,.12) 55%, transparent 70%); }
+    .orb-chart{ 
+  position:absolute; 
+  left:8px; 
+  right:8px; 
+  bottom: 8px; /* 10px에서 8px로 수정 */
+  width:calc(100% - 16px); 
+  height: 62px; /* 82px에서 62px로 수정 */
+  mix-blend-mode:screen; 
+}
+
+    .mvp-grid3{ display:grid; grid-template-columns: 1.1fr 1fr 1fr; gap:12px; padding: 8px 12px 12px; }
+    .mvp-card{ background:rgba(255,255,255,.06); border:1px solid var(--border); border-radius:14px; padding:12px; }
+    .kpi{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .kpi-num{ font-weight:900; font-size:22px; letter-spacing:-.02em; }
+    .kpi-ring{ --p:76; width:68px; height:68px; border-radius:50%;
+      background: radial-gradient(closest-side, #0a0c11 66%, transparent 67% 100%),
+                 conic-gradient(rgba(72,187,255,.95) calc(var(--p)*1%), rgba(255,255,255,.12) 0); position:relative; }
+    .kpi-ring span{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-weight:900; }
+
+    .bars .bars-wrap{ display:flex; align-items:flex-end; gap:8px; height:92px; }
+    .bars .bars-wrap i{ display:block; width:16px; border-radius:8px 8px 4px 4px; border:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(72,187,255,.95), rgba(102,126,234,.95)); }
+
+    /* 가벼운 모션(자동) */
+    .anim-line .orb-chart path[data-line]{ stroke-dasharray:1000; stroke-dashoffset:1000; animation:lineIn 2.4s ease-out forwards; }
+    @keyframes lineIn{ to{ stroke-dashoffset:0; } }
+    .anim-sweep .orb-sweep{ animation:sweep 5.5s linear infinite; }
+    @keyframes sweep{ 0%{transform:translateX(-40%) skewX(-12deg);opacity:.3} 50%{transform:translateX(20%) skewX(-12deg);opacity:.5} 100%{transform:translateX(80%) skewX(-12deg);opacity:.25} }
+    .anim-bars .bars-wrap i{ transform-origin:bottom center; animation:barBreathe 2.6s ease-in-out infinite; }
+    .anim-bars .bars-wrap i:nth-child(odd){ animation-delay:.4s; }
+    @keyframes barBreathe{ 0%{transform:scaleY(1)} 50%{transform:scaleY(1.05)} 100%{transform:scaleY(1)} }
+    @media (prefers-reduced-motion: reduce){ .anim-line .orb-chart path[data-line], .anim-sweep .orb-sweep, .anim-bars .bars-wrap i{ animation:none !important; } }
+  </style>
+
+  <div class="mvp-snap mvp-theme anim-line anim-sweep anim-bars">
+    <div class="mvp-windowbar">
+      <span class="wdot"></span><span class="wdot"></span><span class="wdot"></span>
+      <span class="wlabel">SkillMorph — Dashboard</span>
+    </div>
+
+    <div class="mvp-hero">
+      <div class="mvp-orb">
+        <div class="orb-bg"></div><div class="orb-sweep"></div><div class="orb-grid"></div>
+        <svg class="orb-chart" viewBox="0 0 300 220" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="mvp-line" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="rgba(72,187,255,.95)"/><stop offset="1" stop-color="rgba(102,126,234,.95)"/>
+            </linearGradient>
+            <linearGradient id="mvp-fill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="rgba(120,180,255,.28)"/><stop offset="1" stop-color="rgba(120,180,255,0)"/>
+            </linearGradient>
+          </defs>
+          <path data-line d="M12 190 L38 168 L64 142 L90 148 L116 126 L142 96 L168 78 L194 100 L220 78 L246 90 L288 110"
+                fill="none" stroke="url(#mvp-line)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 190 L38 168 L64 142 L90 148 L116 126 L142 96 L168 78 L194 100 L220 78 L246 90 L288 110 L288 208 L12 208 Z"
+                fill="url(#mvp-fill)" opacity=".7"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="mvp-grid3">
+      <div class="mvp-card kpi">
+        <div class="kpi-meta"><div class="muted">주간 변화</div><div class="kpi-num">+4.2</div><div class="muted">지난주 대비 향상</div></div>
+        <div class="kpi-ring" style="--p:76"><span>76%</span></div>
+      </div>
+      <div class="mvp-card list">
+        <div class="row"><div>파이썬 매출 리포트 자동화</div><span class="pill">D-3</span></div>
+        <div class="row"><div>5분 스탠드업 발표</div><span class="pill">D-1</span></div>
+        <div class="row"><div>1:1 코칭 노트</div><span class="pill">이번주</span></div>
+      </div>
+      <div class="mvp-card bars">
+        <div class="bars-wrap" aria-hidden="true">
+          <i style="height:30%"></i><i style="height:65%"></i><i style="height:90%"></i>
+          <i style="height:55%"></i><i style="height:70%"></i><i style="height:35%"></i><i style="height:20%"></i>
+        </div>
+        <div class="muted right tiny">월~일</div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-feature-1">
+  <style>
+    .mvp-theme{ --text:#f2f6ff; --muted:#cbd5e1; --border:rgba(255,255,255,.18); }
+    .mvp-theme, .mvp-theme *{ color:var(--text); } .mvp-theme .muted{ color:var(--muted); }
+
+    .mvp-grid2{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; padding:12px; }
+    .mvp-card{ background:rgba(255,255,255,.06); border:1px solid var(--border); border-radius:14px; padding:12px; }
+    .list{ display:flex; flex-direction:column; gap:8px; }
+    .row{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px;
+      border:1px dashed rgba(255,255,255,.12); border-radius:12px; background:rgba(255,255,255,.03); min-height:44px; }
+    .row label{ display:flex; align-items:center; gap:8px; cursor:pointer; }
+    .row input[type="checkbox"]{ appearance:none; width:16px; height:16px; border:1px solid var(--border); border-radius:4px; background:rgba(255,255,255,.02); position:relative; }
+    .row input[type="checkbox"]:checked{ background:linear-gradient(135deg, rgba(72,187,255,.95), rgba(102,126,234,.95)); border-color:transparent; }
+    .row input[type="checkbox"]:checked::after{ content:""; position:absolute; left:4px; top:1.5px; width:6px; height:10px; border:2px solid #0b0d12; border-top:none; border-left:none; transform:rotate(45deg); }
+
+    .progress{ position:relative; height:8px; background:rgba(255,255,255,.07); border-radius:999px; overflow:hidden; border:1px solid var(--border); margin-top:8px; }
+    .progress .bar{ height:100%; width:0%; background:linear-gradient(90deg, rgba(72,187,255,.95), rgba(102,126,234,.95));
+      transform-origin:left center; transition:width .6s cubic-bezier(.2,.8,.2,1); }
+    .progress .pct{ position:absolute; right:8px; top:-22px; font-size:12px; opacity:.8; }
+
+    @media (max-width: 900px){ .mvp-grid2{ grid-template-columns:1fr; } }
+  </style>
+
+  <div class="mvp-snap mvp-theme">
+    <div class="mvp-windowbar">
+      <span class="wdot"></span><span class="wdot"></span><span class="wdot"></span>
+      <span class="wlabel">SkillMorph — Plan</span>
+    </div>
+
+    <div class="mvp-grid2">
+      <div class="mvp-card">
+        <h4>주간 성장 플랜 (8/18–8/24)</h4>
+        <div class="list js-todos">
+          <div class="row"><label><input type="checkbox"> <span>파이썬 매출 리포트 자동화</span></label><span class="pill">분석</span></div>
+          <div class="row"><label><input type="checkbox"> <span>5분 스탠드업 스크립트</span></label><span class="pill">커뮤니케이션</span></div>
+          <div class="row"><label><input type="checkbox"> <span>코드 리뷰 3건</span></label><span class="pill">코딩</span></div>
+          <div class="row"><label><input type="checkbox"> <span>1:1 코칭 질문 리스트</span></label><span class="pill">리더십</span></div>
+        </div>
+        <div class="progress js-progress"><div class="bar"></div><span class="pct">0%</span></div>
+      </div>
+
+      <div class="mvp-card">
+        <h4>AI 코치 제안</h4>
+        <div class="list">
+          <div class="row"><div>📌 <b>월요일</b> – SQL 코호트 튜토리얼 30분</div><span class="pill">대기</span></div>
+          <div class="row"><div>📌 <b>수요일</b> – 발표 스토리 템플릿 적용</div><span class="pill">대기</span></div>
+          <div class="row"><div>📌 <b>금요일</b> – 코드 리뷰 프레임</div><span class="pill">대기</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-feature-2">
+  <style>
+    .mvp-theme{ --text:#f2f6ff; --muted:#cbd5e1; --border:rgba(255,255,255,.18); }
+    .mvp-theme, .mvp-theme *{ color:var(--text); } .mvp-theme .muted{ color:var(--muted); }
+
+    .mvp-grid2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:12px; }
+    .mvp-card{ background:rgba(255,255,255,.06); border:1px solid var(--border); border-radius:14px; padding:12px; }
+    .list{ display:flex; flex-direction:column; gap:8px; }
+    .row{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px;
+      border:1px dashed rgba(255,255,255,.12); border-radius:12px; background:rgba(255,255,255,.03); min-height:44px; }
+
+    .btn{ border:1px solid rgba(255,255,255,.2); border-radius:10px; padding:8px 12px; font-weight:800;
+      background:linear-gradient(135deg, rgba(72,187,255,.95), rgba(102,126,234,.95)); color:#081018; cursor:pointer; }
+
+    /* 순차 생성 효과 */
+    .feedback-list .row{ opacity:0; transform:translateY(8px); transition:opacity .35s ease, transform .35s ease; }
+    .feedback-list .row.show{ opacity:1; transform:none; }
+    .loading::after{ content:"생성 중…"; margin-left:8px; font-size:12px; opacity:.8; }
+    @media (max-width: 900px){ .mvp-grid2{ grid-template-columns:1fr; } }
+  </style>
+
+  <div class="mvp-snap mvp-theme">
+    <div class="mvp-windowbar">
+      <span class="wdot"></span><span class="wdot"></span><span class="wdot"></span>
+      <span class="wlabel">SkillMorph — Mentors</span>
+    </div>
+
+    <div class="mvp-grid2">
+      <div class="mvp-card">
+        <h4>과제 제출</h4>
+        <div class="row"><div>매출 리포트 v1.xlsx</div><span class="pill">2일 전</span></div>
+        <div class="row"><div>스탠드업 스크립트 v2.md</div><span class="pill">어제</span></div>
+        <div class="row"><button class="btn js-generate">샘플 피드백 생성</button></div>
+      </div>
+
+      <div class="mvp-card">
+        <h4>AI 멘토 피드백</h4>
+        <div class="list feedback-list js-feedback">
+          <div class="row"><div><span class="pill">요약</span> KPI 카드 3개로 서두 요약</div></div>
+          <div class="row"><div><span class="pill">강점</span> SQL 스니펫 재현 가능</div></div>
+          <div class="row"><div><span class="pill">개선</span> 인사이트→액션 표 추가</div></div>
+          <div class="row"><div><span class="pill">액션</span> (1) 요약 (2) 예측 (3) 스키마</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+
+
+
+</body>
+</html>
