@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SkillMorph — Framer‑Style MVP (Responsive-Fixed)</title>
+  <style>
+    :root{
+      --bg:#0b0d12;
+      --surface: rgba(255,255,255,0.06);
+      --surface-2: rgba(255,255,255,0.08);
+      --border: rgba(255,255,255,0.12);
+      --text:#e8eef6;
+      --muted:#a7b0be;
+      --accent1: 102, 126, 234; /* indigo */
+      --accent2: 118, 75, 162;  /* purple */
+      --accent3: 72, 187, 255;  /* sky */
+      --radius: 18px;
+      --shadow: 0 20px 60px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--text); background:
+        radial-gradient(1200px 600px at 90% -10%, rgba(var(--accent3), .18), transparent 50%),
+        radial-gradient(900px 500px at 0% 0%, rgba(var(--accent1), .15), transparent 55%),
+        #0a0c11;
+      font-family: Inter, ui-sans-serif, -apple-system, Segoe UI, Roboto, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+    }
+
+    /* ===== Top Nav (Framer-ish) ===== */
+    .nav {
+      position: sticky; top:0; z-index:50;
+      display:flex; align-items:center; justify-content:space-between;
+      height:72px; padding:0 20px; backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(10,12,17,.75), rgba(10,12,17,.35));
+      border-bottom: 1px solid var(--border);
+    }
+    .brand { display:flex; align-items:center; gap:12px; font-weight:800; letter-spacing:.2px; }
+    .logo { width:28px; height:28px; border-radius:10px; background:
+      conic-gradient(from 140deg, rgba(var(--accent1),1), rgba(var(--accent3),1), rgba(var(--accent2),1));
+      box-shadow: inset 0 0 22px rgba(255,255,255,.5), 0 0 40px rgba(120,180,255,.25);
+    }
+    .tabs { display:flex; gap:8px; align-items:center; }
+    .tab { padding:10px 14px; border-radius:999px; border:1px solid transparent; color:var(--text); opacity:.9; cursor:pointer; background:none; font-size:15px; }
+    .tab:hover { background: var(--surface); border-color: var(--border); }
+    .tab.active { background: linear-gradient(135deg, rgba(var(--accent1),.35), rgba(var(--accent2),.35)); border-color: rgba(255,255,255,.2); }
+    .cta { padding:10px 16px; border-radius: 999px; border:1px solid rgba(255,255,255,.18); font-weight:800; cursor:pointer;
+      background: linear-gradient(135deg, rgba(var(--accent3),.95), rgba(var(--accent1),.95)); color:#081018; box-shadow: 0 10px 30px rgba(120,180,255,.35); }
+    .ghost { background: transparent; color: var(--text); border:1px solid var(--border); box-shadow:none; }
+
+
+    /* .nav의 '두 번째 div'(=첫 번째 탭 그룹) 안의 비활성 탭 */
+    .nav > .tabs:nth-of-type(2) .tab:not(.active){
+      background:#fff;
+      color:#000 !important;
+      border:1px solid #ddd;
+      text-shadow:none;
+      opacity:1;
+    }
+    .nav > .tabs:nth-of-type(2) .tab:not(.active):hover{
+      background:#fff;
+      border-color:#ccc;
+    }
+
+
+    /* ===== Hero ===== */
+    .hero { position: relative; padding: 64px 20px 28px; overflow:hidden; }
+    .hero-inner{ max-width:1200px; margin:0 auto; display:grid; grid-template-columns:1.1fr .9fr; gap:24px; align-items:center; }
+    .h1 { font-size: clamp(32px, 5vw, 56px); line-height:1.05; font-weight:900; letter-spacing:-.02em; }
+    .sub { margin-top: 12px; font-size: 18px; color: var(--muted); }
+    .hero-actions{ display:flex; gap:12px; margin-top:22px; }
+
+    /* === ORB: glass + neon + parallax === */
+    .orb-wrap{ position: relative; height: 340px; perspective: 1000px; }
+    .orb{
+      --tilt-x: 12deg;                 /* 기본 각도 */
+      --tilt-y: -14deg;
+      position:absolute; inset:0; border-radius: 30px;
+      overflow:hidden; transform-style: preserve-3d;
+      transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+      border:1px solid var(--border);
+      background:
+        /* 유리판 텍스처 */
+        linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.02)),
+        radial-gradient(120% 160% at 0% 0%, rgba(255,255,255,.06), transparent 60%);
+      box-shadow:
+        0 30px 80px rgba(0,0,0,.45),
+        0 0 0 1px rgba(255,255,255,.06) inset;
+      backdrop-filter: blur(8px) saturate(120%);
+    }
+
+    /* 컬러 블롭 + 살짝 hue shift */
+    .orb::before{
+      content:""; position:absolute; inset:-30% -30%;
+      background:
+        radial-gradient(closest-side at 15% 30%, rgba(72,187,255,.35), transparent 60%) ,
+        radial-gradient(closest-side at 85% 20%, rgba(102,126,234,.35), transparent 60%),
+        radial-gradient(closest-side at 60% 80%, rgba(118,75,162,.35), transparent 60%);
+      filter: blur(18px) saturate(110%);
+      animation: orbFloat 10s ease-in-out infinite, hue 18s linear infinite;
+      transform: translateZ(-1px); /* 깊이감 */
+    }
+
+    /* 유리광(글로스) 스윕 */
+    .orb::after{
+      content:""; position:absolute; inset:-20% -20%;
+      background: linear-gradient(75deg, rgba(255,255,255,0) 40%, rgba(255,255,255,.12) 55%, rgba(255,255,255,0) 70%);
+      transform: translateX(-30%) skewX(-12deg);
+      mix-blend-mode: screen; pointer-events:none;
+      animation: sweep 6s ease-in-out infinite;
+    }
+    
+    .orb-grid{
+      position:absolute; inset:0; pointer-events:none;
+      background:
+        linear-gradient(to right, rgba(255,255,255,.08) 1px, transparent 1px) 0 0/ 40px 40px,
+        linear-gradient(to bottom, rgba(255,255,255,.06) 1px, transparent 1px) 0 0/ 40px 40px;
+      mask: linear-gradient(180deg, transparent, #000 20% 80%, transparent);
+      opacity:.75;
+    }
+    
+    .orb-spark{
+      position:absolute; inset:0; pointer-events:none; mix-blend-mode:screen;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,.28), transparent 35%) ,
+        radial-gradient(circle at 70% 60%, rgba(255,255,255,.18), transparent 35%),
+        radial-gradient(circle at 40% 80%, rgba(255,255,255,.22), transparent 35%);
+      filter: blur(2px);
+      animation: spark 7s ease-in-out infinite alternate;
+    }
+    
+    .orb{ background-position:
+          calc(var(--mx,0) * 8px) calc(var(--my,0) * 8px),
+          calc(var(--mx,0) * -6px) calc(var(--my,0) * -6px);
+    }
+    .orb::before{ background-position:
+          calc(10% + var(--mx,0) * 20px) calc(30% + var(--my,0) * 20px),
+          calc(80% + var(--mx,0) * -16px) calc(20% + var(--my,0) * -16px),
+          calc(60% + var(--mx,0) * 12px) calc(70% + var(--my,0) * 12px);
+    }
+
+    /* 키프레임 */
+    @keyframes orbFloat{ 0%,100%{ transform: translateZ(-1px) translateY(0)} 50%{ transform: translateZ(-1px) translateY(-18px)} }
+    @keyframes hue{ 0%{ filter:hue-rotate(0deg) blur(18px) saturate(110%);} 100%{ filter:hue-rotate(360deg) blur(18px) saturate(110%);} }
+    @keyframes sweep{ 0%,100%{ transform: translateX(-30%) skewX(-12deg);} 50%{ transform: translateX(30%) skewX(-12deg);} }
+    @keyframes spark{ 0%{ opacity:.45; filter: blur(2px);} 100%{ opacity:.8; filter: blur(1.5px);} }
+    
+    @media (prefers-reduced-motion: reduce){
+      .orb, .orb::before, .orb::after, .orb-spark{ animation: none !important; }
+    }
+    
+    .orb-chart{
+      position:absolute; inset:18px 16px 18px 16px;
+      width:calc(100% - 32px); height:calc(100% - 36px);
+      mix-blend-mode:screen;
+      pointer-events:none;
+    }
+    .orb-chart #oc-line-path{ filter: drop-shadow(0 2px 6px rgba(120,180,255,.28)); }
+    .orb-chart #oc-dots circle{ filter: drop-shadow(0 1px 4px rgba(120,180,255,.35)); }
+
+    /* ===== ORB overlay cards ===== */
+    .orb-hints{ position:absolute; inset:0; pointer-events:none; }
+    .hint-card{
+      position:absolute; width:min(260px, 42%);
+      padding:12px 12px 10px; border-radius:14px;
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
+      border:1px solid var(--border);
+      box-shadow: 0 12px 40px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.06);
+      backdrop-filter: blur(8px) saturate(120%);
+      color: var(--text);
+      pointer-events:auto;
+      transform: translateY(6px) scale(.98);
+      opacity:0;
+      animation: hint-in .6s ease forwards;
+    }
+    .hint-card:hover{ transform: translateY(0) scale(1); }
+    .hint-card .hint-head{ font-size:12px; letter-spacing:.2px; opacity:.85; margin-bottom:6px; }
+    .hint-card .hint-body{ font-size:13px; line-height:1.5; }
+    .hint-cta{
+      margin-top:8px; padding:8px 10px; border-radius:10px;
+      font-weight:800; cursor:pointer; border:1px solid rgba(255,255,255,.18);
+      background: linear-gradient(135deg, rgba(var(--accent3),.95), rgba(var(--accent1),.95));
+      color:#081018; box-shadow: 0 6px 18px rgba(120,180,255,.35);
+    }
+    .hint-cta.ghost{ background:transparent; color:var(--text); border:1px solid var(--border); box-shadow:none; }
+
+    .hint-1{ top:14px; left:16px; animation-delay:.1s; }
+    .hint-2{ right:16px; bottom:18px; animation-delay:.25s; }
+    .hint-body b{ font-weight:900; }
+    .hint-card, .hint-body{ overflow-wrap:anywhere; word-break:keep-all; }
+
+    @keyframes hint-in{
+      from{ opacity:0; transform: translateY(10px) scale(.96); }
+      to  { opacity:1; transform: translateY(6px)  scale(.98); }
+    }
+    
+    @media (prefers-reduced-motion: reduce){
+      .hint-card{ animation:none; transform:none; }
+    }
+    
+    /* ===== Main layout ===== */
+    main{ max-width:1200px; margin: 0 auto; padding: 18px 20px 40px; }
+    .grid{ display:grid; gap:18px; }
+    .cols-3{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .cols-2{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    
+    .card{ background: var(--surface); border:1px solid var(--border); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); transition: transform .18s ease, background .18s ease, border-color .18s ease; }
+    .card:hover{ transform: translateY(-3px); background: var(--surface-2); border-color: rgba(255,255,255,.2); }
+    .card h3{ margin: 0 0 10px; font-size: 16px; letter-spacing:.2px; }
+    .muted{ color: var(--muted); }
+    .pill{ font-size: 12px; padding: 6px 10px; border-radius: 999px; border:1px solid var(--border); background: rgba(255,255,255,.05); }
+    .list{ display:flex; flex-direction:column; gap:10px; }
+    .row{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; border:1px dashed rgba(255,255,255,.12); border-radius:12px; background: rgba(255,255,255,.03); }
+
+    /* KPIs */
+    .kpi{ display:flex; align-items:center; justify-content:space-between; gap:14px; }
+    .ring{ --p:76; width: 92px; height:92px; border-radius:50%; background:
+      radial-gradient(closest-side, #0a0c11 66%, transparent 67% 100%),
+      conic-gradient(rgba(var(--accent3), .95) calc(var(--p)*1%), rgba(255,255,255,.12) 0);
+      position:relative; border:1px solid var(--border); }
+    .ring span{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-weight:900; }
+    .bars{ display:flex; align-items:flex-end; gap:10px; height: 140px; }
+    .bar{ width: 22px; background: linear-gradient(180deg, rgba(var(--accent3),.95), rgba(var(--accent1),.95)); border-radius: 8px 8px 4px 4px; border:1px solid var(--border); }
+
+    /* Radar */
+    .radar{ width:100%; height:260px; }
+
+    /* Modal */
+    .modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background: rgba(8,10,14,.6); backdrop-filter: blur(6px); z-index:60; }
+    .dialog{ width:min(560px,92vw); border-radius: 16px; overflow:hidden; border:1px solid var(--border); box-shadow: var(--shadow); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); }
+    .dialog header{ padding: 14px 16px; font-weight: 900; border-bottom:1px solid var(--border); background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02)); }
+    .dialog main{ padding: 14px; display:grid; gap:10px; }
+    .dialog footer{ display:flex; justify-content:flex-end; gap:10px; padding:12px 16px; border-top:1px solid var(--border); }
+
+    .btn { border:1px solid rgba(255,255,255,.2); border-radius: 12px; padding: 10px 14px; cursor:pointer; color:#081018; font-weight:800; background: linear-gradient(135deg, rgba(var(--accent3),.95), rgba(var(--accent1),.95)); box-shadow: 0 10px 24px rgba(120,180,255,.35); }
+    .btn.ghost { background: transparent; color: var(--text); border:1px solid var(--border); box-shadow:none; }
+
+    /* Views */
+    .view{ display:none; animation:fade .22s ease; }
+    .view.active{ display:block; }
+    @keyframes fade{ from{ opacity:.6; transform: translateY(4px);} to{ opacity:1; transform:none; } }
+
+    /* Quests Layout */
+    #quests .grid{ display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    #quests .card.catalog{ grid-column: 1 / -1; }
+    
+    #quests .list .row{
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto; /* 버튼 너비 자동 조정 */
+      align-items: center;
+      gap: 10px;
+      min-height: 56px;
+    }
+    #quests .list .row > div:first-child{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      word-break: keep-all;
+    }
+    #quests .list .row .btn{
+      padding: 10px 14px;
+      white-space: nowrap;
+    }
+
+    /* --- Hamburger Menu --- */
+    .hamburger-btn {
+      display: none; /* 기본 숨김 */
+      flex-direction: column;
+      justify-content: space-around;
+      width: 28px; height: 28px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      z-index: 70;
+    }
+    .hamburger-btn span {
+      width: 24px; height: 2px;
+      background: var(--text);
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      transform-origin: 3px;
+    }
+    .nav.is-open .hamburger-btn span:nth-child(1) { transform: rotate(45deg); }
+    .nav.is-open .hamburger-btn span:nth-child(2) { opacity: 0; transform: translateX(-20px); }
+    .nav.is-open .hamburger-btn span:nth-child(3) { transform: rotate(-45deg); }
+
+    .nav-menu {
+      display: flex; /* 데스크톱에서 기본 flex */
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 1080px){
+      .hero-inner{ grid-template-columns:1fr; }
+      .orb-wrap{ order:-1; height: 280px;}
+      .cols-3{ grid-template-columns: 1fr 1fr; }
+      #quests .grid{ grid-template-columns: 1fr; }
+      #quests .card.catalog{ grid-column: auto; }
+    }
+
+    @media (max-width: 900px){
+      .nav { height: 60px; padding: 0 16px; }
+      .nav .tabs:not(.right-actions) { display: none; } /* 메뉴 탭 숨기기 */
+      .hamburger-btn { display: flex; } /* 햄버거 버튼 보이기 */
+
+      .nav-menu {
+        position: absolute;
+        top: 60px; /* nav 높이만큼 */
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        background: rgba(10, 12, 17, .85);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border);
+        padding: 8px;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.35s ease-out, padding .35s ease-out;
+      }
+      .nav.is-open .nav-menu {
+        max-height: 500px; /* 충분한 높이 */
+        padding: 8px;
+      }
+      .nav-menu .tab {
+        padding: 12px 16px;
+        text-align: left;
+        border-radius: 10px;
+      }
+      .nav-menu .tab.active {
+        background: linear-gradient(135deg, rgba(var(--accent1),.25), rgba(var(--accent2),.25));
+        border-color: transparent;
+      }
+
+      .hero{ padding-bottom: 14px; }
+      .orb-wrap{ height: 260px; }
+      .hint-card{ width:min(240px, 48%); font-size:95%; }
+    }
+
+    @media (max-width: 720px){
+      .cols-3, .cols-2{ grid-template-columns: 1fr; }
+      .hint-card{ width:calc(100% - 32px); left:16px; right:16px; }
+      .hint-1{ top:12px; }
+      .hint-2{    bottom: auto; /* bottom 속성 초기화 */
+    top: 135px;   /* 위에서부터 고정된 위치에 배치 */}
+    }
+
+    @media (max-width: 640px){
+      /* 1) 네비 압축 */
+      .nav{ height:56px; padding:0 12px; }
+      .nav.is-open .nav-menu { top: 56px; }
+      .brand{ gap:8px; font-size:14px; }
+      .logo{ width:22px; height:22px; border-radius:8px; }
+      .tab, .cta { padding:8px 12px; font-size:13px; }
+      .cta{ box-shadow:none; }
+
+      /* 2) 히어로 축소 */
+      .hero{ padding: 28px 16px 8px; }
+      .orb-wrap{ height: 280px; } /* 높이를 30px 늘림 */ }
+      .hint-card{ width: calc(100% - 28px); left:14px; right:14px; }
+      .hint-1{ top:8px; }
+      .hint-2{    bottom: auto; /* bottom 속성 초기화 */
+    top: 130px;   /* 위에서부터 고정된 위치에 배치 */ }
+
+      /* 3) 대시보드 카드 */
+      .card{ padding: 14px; }
+      .row{ min-height: 52px; padding: 10px; gap:8px; }
+      .pill{ font-size:11px; padding:5px 8px; }
+
+      /* 4) 리스트 버튼 글자 넘침 방지 개선 */
+      #quests .list .row {
+        grid-template-columns: minmax(0,1fr) auto;
+      }
+      #quests .list .row .btn {
+        font-size:13px;
+        padding: 10px 12px;
+      }
+      /* 5) KPI/바차트 축소 */
+      .ring{ width:78px; height:78px; }
+      .bars{ height: 110px; gap:8px; }
+      .bar{ width:18px; }
+
+      /* 6) 모달 여백 확대 */
+      .dialog{ width: 94vw; }
+      .dialog main{ padding: 12px; }
+    }
+
+    /* 초소형 기기(<=360px): 글자 크기 더 줄임 */
+    @media (max-width: 360px){
+      .tab, .cta{ font-size:12px; padding:7px 10px; }
+      .h1{ font-size: clamp(28px, 7vw, 42px); }
+    }
+
+/* Plan 페이지 버튼/플래그 깨짐 방지 */
+#plan .list .row .pill,
+#plan .list .row .btn {
+  white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+  flex-shrink: 0;      /* 요소 크기가 줄어드는 것을 방지 */
+}
+
+/* Mentors 페이지 과제 제출 영역 UI 개선 */
+#mentor .card:first-child .row {
+  flex-wrap: wrap; /* 공간이 부족하면 요소들이 다음 줄로 넘어가도록 허용 */
+}
+
+#mentor .card:first-child .row .btn {
+  white-space: nowrap; /* 버튼 글씨는 깨지지 않도록 유지 */
+}
+
+  </style>
+</head>
+<body>
+  <div class="nav" id="main-nav">
+    <div class="brand"><div class="logo" aria-hidden="true"></div><div>SkillMorph</div></div>
+    
+    <div class="nav-menu" id="nav-menu">
+      <button class="tab active" onclick="switchView('dashboard', this)">Dashboard</button>
+      <button class="tab" onclick="switchView('plan', this)">Plan</button>
+      <button class="tab" onclick="switchView('quests', this)">Quests</button>
+      <button class="tab" onclick="switchView('mentor', this)">Mentors</button>
+      <button class="tab" onclick="switchView('profile', this)">Profile</button>
+    </div>
+    
+    <div class="tabs right-actions">
+      <button class="tab ghost" onclick="toggleTheme()">🌓</button>
+      <button class="cta" onclick="alert('데모 예약 페이지로 이동')">Start Free</button>
+    </div>
+
+    <button class="hamburger-btn" id="hamburger-btn" aria-label="메뉴 열기" aria-controls="nav-menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+
+  <section class="hero" id="hero">
+    <div class="hero-inner">
+      <div>
+        <div class="h1">AI 멘토로<br/>당신의 역량을 가속하세요.</div>
+        <div class="sub">개인 목표에 맞춘 성장 플랜, 실행형 퀘스트, 실시간 멘토 피드백까지 — 한 곳에서.</div>
+        <div class="hero-actions">
+          <button class="cta" onclick="document.getElementById('dashboard').scrollIntoView({behavior:'smooth'})">대시보드 보기</button>
+          <button class="tab ghost" onclick="switchView('quests'); document.getElementById('hero').style.display='none'">퀘스트 탐색</button>
+        </div>
+      </div>
+
+<div class="orb-wrap">
+  <div class="orb" aria-hidden="true">
+    <div class="orb-grid"></div>
+    <div class="orb-spark"></div>
+
+    <svg class="orb-chart" viewBox="0 0 300 220" role="img" aria-label="주간 퍼포먼스 추이">
+      <defs>
+        <linearGradient id="oc-line" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0"  stop-color="rgba(72,187,255,.95)"/>
+          <stop offset="1"  stop-color="rgba(102,126,234,.95)"/>
+        </linearGradient>
+        <linearGradient id="oc-fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="rgba(120,180,255,.28)"/>
+          <stop offset="1" stop-color="rgba(120,180,255,0)"/>
+        </linearGradient>
+        <linearGradient id="oc-fade" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0"   stop-color="#000" stop-opacity="0"/>
+          <stop offset=".15" stop-color="#000" stop-opacity=".9"/>
+          <stop offset=".85" stop-color="#000" stop-opacity=".9"/>
+          <stop offset="1"   stop-color="#000" stop-opacity="0"/>
+        </linearGradient>
+        <mask id="oc-mask"><rect width="300" height="220" fill="url(#oc-fade)"/></mask>
+      </defs>
+      <g mask="url(#oc-mask)" opacity=".55">
+        <g stroke="rgba(255,255,255,.1)" stroke-width="1">
+          <g id="oc-v"></g>
+          <g id="oc-h"></g>
+        </g>
+      </g>
+      <path id="oc-area" fill="url(#oc-fill)" opacity=".85"></path>
+      <path id="oc-line-path" fill="none" stroke="url(#oc-line)" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round"></path>
+      <g id="oc-dots"></g>
+    </svg>
+
+    <div class="orb-hints">
+      <article class="hint-card hint-1" role="note" aria-label="AI 코치 제안">
+        <div class="hint-head">🤖 AI 코치</div>
+        <div class="hint-body">
+          <b>프레젠테이션</b> 시작을 KPI 2장 요약으로 바꿔보세요.
+        </div>
+        <button class="hint-cta">적용</button>
+      </article>
+      <article class="hint-card hint-2" role="note" aria-label="인사이트">
+        <div class="hint-head">⚡ 인사이트</div>
+        <div class="hint-body">
+          8주차 리텐션이 급락했습니다. <b>온보딩 메일</b> A/B 테스트를 제안합니다.
+        </div>
+        <button class="hint-cta ghost">자세히</button>
+      </article>
+    </div>
+  </div>
+</div>
+    </div>
+  </section>
+
+  <main>
+    <section id="dashboard" class="view active">
+      <div class="grid cols-3">
+        <div class="card">
+          <h3>현재 스킬 점수</h3>
+          <div class="kpi">
+            <div>
+              <div class="muted">주간 변화</div>
+              <div style="font-size:28px; font-weight:900; letter-spacing:-.02em;">+4.2</div>
+              <div class="muted" style="margin-top:4px;">지난주 대비 향상</div>
+            </div>
+            <div class="ring" style="--p:76"><span>76%</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>활성 퀘스트</h3>
+          <div class="list">
+            <div class="row"><div>파이썬으로 매출 리포트 자동화</div><span class="pill">D-3</span></div>
+            <div class="row"><div>5분 스탠드업 발표</div><span class="pill">D-1</span></div>
+            <div class="row"><div>1:1 코칭 노트 작성</div><span class="pill">이번주</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>이번주 활동</h3>
+          <div class="bars" aria-label="주간 활동 그래프">
+            <div class="bar" style="height:30%"></div>
+            <div class="bar" style="height:65%"></div>
+            <div class="bar" style="height:90%"></div>
+            <div class="bar" style="height:55%"></div>
+            <div class="bar" style="height:70%"></div>
+            <div class="bar" style="height:35%"></div>
+            <div class="bar" style="height:20%"></div>
+          </div>
+          <div class="muted" style="text-align:right; font-size:12px;">월~일</div>
+        </div>
+      </div>
+
+      <div class="grid cols-2" style="margin-top:18px;">
+        <div class="card">
+          <h3>스킬 레이더</h3>
+          <svg class="radar" viewBox="0 0 300 260" aria-label="스킬 레이더 차트">
+            <g stroke="rgba(255,255,255,.18)" stroke-width="1">
+              <polygon points="150,20 280,110 240,240 60,240 20,110" fill="none"/>
+              <polygon points="150,48 252,118 222,218 78,218 48,118" fill="none"/>
+              <polygon points="150,76 224,126 204,196 96,196 76,126" fill="none"/>
+            </g>
+            <polygon points="150,64 236,120 198,200 108,212 70,130" fill="rgba(120,180,255,.3)" stroke="rgba(120,180,255,.9)" stroke-width="2"/>
+            <g fill="var(--muted)" font-size="12" text-anchor="middle">
+              <text x="150" y="14">분석</text>
+              <text x="286" y="112">커뮤니케이션</text>
+              <text x="246" y="252">디자인</text>
+              <text x="54" y="252">코딩</text>
+              <text x="14" y="112">리더십</text>
+            </g>
+          </svg>
+          <div class="pill" style="display:inline-block; margin-top:8px;">목표 90%</div>
+        </div>
+        <div class="card">
+          <h3>추천 퀘스트</h3>
+          <div class="list">
+            <div class="row"><div>SQL로 리텐션 코호트 만들기</div><button class="btn" onclick="openQuest()">시작</button></div>
+            <div class="row"><div>2장 프레젠테이션 스토리텔링</div><button class="btn" onclick="openQuest()">시작</button></div>
+            <div class="row"><div>JS로 간단한 A/B 실험 구현</div><button class="btn" onclick="openQuest()">시작</button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="plan" class="view">
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>주간 성장 플랜 (8/18–8/24)</h3>
+          <div class="list">
+            <label class="row"><span><input type="checkbox" onclick="tick(this)"/> 파이썬으로 매출 리포트 자동화</span><span class="pill">분석</span></label>
+            <label class="row"><span><input type="checkbox" onclick="tick(this)"/> 5분 스탠드업 발표 스크립트 작성</span><span class="pill">커뮤니케이션</span></label>
+            <label class="row"><span><input type="checkbox" onclick="tick(this)"/> 코드 리뷰 3건 피드백 남기기</span><span class="pill">코딩</span></label>
+            <label class="row"><span><input type="checkbox" onclick="tick(this)"/> 1:1 코칭 질문 리스트 생성</span><span class="pill">리더십</span></label>
+          </div>
+          <div style="margin-top:12px;">
+            <div class="muted">완료율</div>
+            <div style="height:10px; border-radius:999px; background: rgba(255,255,255,.06); border:1px solid var(--border); overflow:hidden;">
+              <div id="planProgress" style="height:100%; width:25%; background: linear-gradient(90deg, rgba(var(--accent3),.95), rgba(var(--accent1),.95));"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>AI 코치 제안</h3>
+          <div class="list">
+            <div class="row"><div>📌 <b>월요일</b> – SQL 코호트 분석 튜토리얼 30분</div><button class="btn ghost">대기</button></div>
+            <div class="row"><div>📌 <b>수요일</b> – 발표 스크립트 템플릿 적용</div><button class="btn ghost">대기</button></div>
+            <div class="row"><div>📌 <b>금요일</b> – 코드 리뷰 피드백 프레임</div><button class="btn ghost">대기</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:18px;">
+        <h3>마일스톤 타임라인</h3>
+        <div class="list">
+          <div class="row"><div>🎯 <b>8월</b> – 데이터 분석 기초 확립</div><span class="pill">진행중</span></div>
+          <div class="row"><div>🎯 <b>9월</b> – 커뮤니케이션 향상 (발표·문서)</div><span class="pill">예정</span></div>
+          <div class="row"><div>🎯 <b>10월</b> – 리더십 미니 프로젝트 리드</div><span class="pill">예정</span></div>
+        </div>
+      </div>
+    </section>
+<section id="quests" class="view">
+  <div class="grid">
+    <div class="card catalog">
+      <h3>퀘스트 카탈로그</h3>
+      <div class="list">
+        <div class="row"><div><span class="pill">분석·초급</span> SQL로 리텐션 코호트 만들기</div><button class="btn" onclick="openQuest()">시작</button></div>
+        <div class="row"><div><span class="pill">코딩·중급</span> A/B Test 트래킹 이벤트 설계</div><button class="btn" onclick="openQuest()">시작</button></div>
+        <div class="row"><div><span class="pill">커뮤니케이션·초급</span> 2장 프레젠테이션 쓰기</div><button class="btn" onclick="openQuest()">시작</button></div>
+        <div class="row"><div><span class="pill">리더십·중급</span> 1:1 코칭 대화 프레임</div><button class="btn" onclick="openQuest()">시작</button></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>진행 중</h3>
+      <div class="list">
+        <div class="row"><div>파이썬으로 매출 리포트 자동화</div><span class="pill">D-3</span></div>
+        <div class="row"><div>5분 스탠드업 발표</div><span class="pill">D-1</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>보상 & 뱃지</h3>
+      <div class="list">
+        <div class="row"><div>🏅 분석 입문 배지</div><span class="pill">획득</span></div>
+        <div class="row"><div>🏅 발표 챌린지 배지</div><span class="pill">진행중</span></div>
+        <div class="row"><div>🏅 코드 리뷰어 배지</div><span class="pill">예정</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+    <section id="mentor" class="view">
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>과제 제출</h3>
+          <p class="muted">분석 리포트나 발표 슬라이드를 업로드하면 AI 멘토 피드백이 생성됩니다.</p>
+          <div class="row" style="justify-content:flex-start; gap:12px;">
+            <input type="file" aria-label="파일 업로드"/>
+            <button class="btn" onclick="fakeReview()">피드백 받기</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>최근 제출물</h3>
+          <div class="list">
+            <div class="row"><div>매출 리포트 v1.xlsx</div><span class="pill">2일 전</span></div>
+            <div class="row"><div>스탠드업 스크립트 v2.md</div><span class="pill">어제</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:18px;">
+        <h3>AI 멘토 피드백</h3>
+        <div id="feedback" class="list">
+          <div class="row"><div>아직 피드백이 없습니다. 좌측에서 파일을 업로드하거나 샘플 피드백을 생성하세요.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="profile" class="view">
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>프로필</h3>
+          <div class="list">
+            <div class="row"><div>이름</div><span class="pill">홍길동</span></div>
+            <div class="row"><div>직무</div><span class="pill">Product Designer</span></div>
+            <div class="row"><div>목표</div><span class="pill">데이터 기반 의사결정</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>환경 설정</h3>
+          <div class="list">
+            <div class="row"><div>알림</div><button class="btn ghost">설정</button></div>
+            <div class="row"><div>연동</div><button class="btn ghost">Google 연결</button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="questModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="questTitle">
+    <div class="dialog">
+      <header id="questTitle">퀘스트 시작하기</header>
+      <main>
+        <div class="muted">목표</div>
+        <div>SQL로 리텐션 코호트 분석 테이블을 만들고, 주별 유지율을 시각화합니다.</div>
+        <div class="muted">요구사항</div>
+        <ul>
+          <li>회원 가입 주차별 코호트 생성</li>
+          <li>주차 N의 리텐션 계산</li>
+          <li>히트맵 형태로 시각화</li>
+        </ul>
+        <div class="muted">예상 소요</div>
+        <div>3시간 · 난이도 중</div>
+      </main>
+      <footer>
+        <button class="btn ghost" onclick="closeQuest()">취소</button>
+        <button class="btn" onclick="startQuest()">추가하기</button>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    const nav = document.getElementById('main-nav');
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+
+    function toggleMenu() {
+      nav.classList.toggle('is-open');
+    }
+
+    hamburgerBtn.addEventListener('click', toggleMenu);
+
+    function switchView(id, btn){
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      
+      // nav-menu 안의 버튼들과 동기화
+      document.querySelectorAll('#nav-menu .tab').forEach(b => b.classList.remove('active'));
+      const activeBtn = Array.from(document.querySelectorAll('#nav-menu .tab')).find(b => b.textContent.toLowerCase() === id);
+      if(activeBtn) activeBtn.classList.add('active');
+
+      // hero는 대시보드에서만 노출
+      document.getElementById('hero').style.display = (id==='dashboard') ? 'block' : 'none';
+      
+      // 메뉴를 클릭하면 햄버거 메뉴 닫기
+      if (nav.classList.contains('is-open')) {
+        toggleMenu();
+      }
+    }
+
+    // plan progress
+    function tick(cb){
+      const list = cb.closest('.list');
+      const checks = list.querySelectorAll('input[type="checkbox"]');
+      const done = Array.from(checks).filter(c => c.checked).length;
+      const pct = Math.round((done / checks.length) * 100);
+      document.getElementById('planProgress').style.width = pct + '%';
+    }
+
+    // modal
+    function openQuest(){ document.getElementById('questModal').style.display='flex'; }
+    function closeQuest(){ document.getElementById('questModal').style.display='none'; }
+    function startQuest(){ closeQuest(); switchView('quests'); alert('퀘스트가 추가되었습니다. 진행 중 목록을 확인하세요.'); }
+
+    // mentor feedback mock
+    function fakeReview(){
+      const box = document.getElementById('feedback');
+      box.innerHTML='';
+      const items=[
+        {t:'요약', c:'핵심 KPI 카드 3개로 서두 요약, 스토리라인 강화.'},
+        {t:'강점', c:'데이터 소스 명확, SQL 스니펫 재현 가능, 시각화 일관성.'},
+        {t:'개선', c:'인사이트→액션 매핑 표 추가, 예측 그래프 도입.'},
+        {t:'액션', c:'(1) 요약 카드 (2) 예측 추가 (3) 원데이터 스키마 부록'}
+      ];
+      items.forEach(b=>{
+        const row=document.createElement('div');
+        row.className='row';
+        row.innerHTML=`<div><span class="pill">${b.t}</span> ${b.c}</div>`;
+        box.appendChild(row);
+      });
+    }
+
+    // theme toggle: dark <-> light (Framer-ish)
+    let dark=true;
+    function toggleTheme(){
+      dark=!dark;
+      if(!dark){
+        document.documentElement.style.setProperty('--bg','#f7f8fb');
+        document.documentElement.style.setProperty('--surface','rgba(0,0,0,.04)');
+        document.documentElement.style.setProperty('--surface-2','rgba(0,0,0,.06)');
+        document.documentElement.style.setProperty('--border','rgba(0,0,0,.12)');
+        document.documentElement.style.setProperty('--text','#0b0d12');
+        document.documentElement.style.setProperty('--muted','#4b5563');
+        document.body.style.background = 'linear-gradient(180deg,#fbfcff,#f5f7fc)';
+      } else {
+        document.documentElement.style.setProperty('--bg','#0b0d12');
+        document.documentElement.style.setProperty('--surface','rgba(255,255,255,0.06)');
+        document.documentElement.style.setProperty('--surface-2','rgba(255,255,255,0.08)');
+        document.documentElement.style.setProperty('--border','rgba(255,255,255,0.12)');
+        document.documentElement.style.setProperty('--text','#e8eef6');
+        document.documentElement.style.setProperty('--muted','#a7b0be');
+        document.body.style.background = 'radial-gradient(1200px 600px at 90% -10%, rgba(72,187,255,.18), transparent 50%), radial-gradient(900px 500px at 0% 0%, rgba(102,126,234,.15), transparent 55%), #0a0c11';
+      }
+    }
+
+  // ORB parallax tilt + bg shift
+  (function(){
+    const wrap = document.querySelector('.orb-wrap');
+    const orb  = wrap?.querySelector('.orb');
+    if(!wrap || !orb) return;
+
+    const baseX = 12, baseY = -14;
+    function setTilt(x, y){
+      orb.style.setProperty('--tilt-x', `${baseX + (-y*10)}deg`);
+      orb.style.setProperty('--tilt-y', `${baseY + ( x*16)}deg`);
+      orb.style.setProperty('--mx', x.toFixed(3));
+      orb.style.setProperty('--my', y.toFixed(3));
+    }
+
+    wrap.addEventListener('pointermove', (e)=>{
+      const r = wrap.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width  - .5;
+      const y = (e.clientY - r.top)  / r.height - .5;
+      setTilt(x, y);
+    });
+
+    wrap.addEventListener('pointerleave', ()=>{
+      orb.style.setProperty('--tilt-x', `${baseX}deg`);
+      orb.style.setProperty('--tilt-y', `${baseY}deg`);
+      orb.style.setProperty('--mx', 0);
+      orb.style.setProperty('--my', 0);
+    });
+  })();
+
+     // ORB 미니 차트
+  (function(){
+    const svg = document.querySelector('.orb-chart');
+    if(!svg) return;
+
+    const data = [42, 55, 68, 64, 78, 92, 70, 84, 96, 88, 75, 82];
+
+    const vb = svg.viewBox.baseVal;
+    const padding = {l:12, r:12, t:12, b:18};
+    const W = vb.width  - padding.l - padding.r;
+    const H = vb.height - padding.t - padding.b;
+
+    const maxY = Math.max(100, Math.max(...data));
+    const stepX = W / (data.length - 1);
+    const x = i => padding.l + i * stepX;
+    const y = v => padding.t + (1 - v / maxY) * H;
+
+    const vg = svg.querySelector('#oc-v');
+    const hg = svg.querySelector('#oc-h');
+    for(let i=0;i<=W;i+=20){
+      const ln = document.createElementNS('http://www.w3.org/2000/svg','line');
+      ln.setAttribute('x1', padding.l + i); ln.setAttribute('y1', padding.t);
+      ln.setAttribute('x2', padding.l + i); ln.setAttribute('y2', padding.t + H);
+      vg.appendChild(ln);
+    }
+    for(let j=0;j<=H;j+=20){
+      const ln = document.createElementNS('http://www.w3.org/2000/svg','line');
+      ln.setAttribute('x1', padding.l); ln.setAttribute('y1', padding.t + j);
+      ln.setAttribute('x2', padding.l + W); ln.setAttribute('y2', padding.t + j);
+      hg.appendChild(ln);
+    }
+
+    const line = svg.querySelector('#oc-line-path');
+    const area = svg.querySelector('#oc-area');
+    const dots = svg.querySelector('#oc-dots');
+
+    const dLine = data.map((v,i)=> (i===0?'M':'L') + x(i) + ' ' + y(v)).join(' ');
+    const dArea = `M ${x(0)} ${y(0)} ` + data.map((v,i)=> `L ${x(i)} ${y(v)}`).join(' ')
+                 + ` L ${x(data.length-1)} ${padding.t+H} L ${x(0)} ${padding.t+H} Z`;
+
+    line.setAttribute('d', dLine);
+    area.setAttribute('d', dArea);
+
+    data.forEach((v,i)=>{
+      const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c.setAttribute('cx', x(i)); c.setAttribute('cy', y(v)); c.setAttribute('r', 2.8);
+      c.setAttribute('fill', 'rgba(255,255,255,.9)');
+      dots.appendChild(c);
+    });
+
+    const len = line.getTotalLength();
+    line.style.strokeDasharray = len;
+    line.style.strokeDashoffset = len;
+    area.style.opacity = 0;
+
+    requestAnimationFrame(()=>{
+      line.style.transition = 'stroke-dashoffset 900ms ease';
+      area.style.transition = 'opacity 900ms ease';
+      line.style.strokeDashoffset = 0;
+      area.style.opacity = .85;
+    });
+
+    const wrap = document.querySelector('.orb-wrap');
+    if(wrap){
+      wrap.addEventListener('pointermove', (e)=>{
+        const r = wrap.getBoundingClientRect();
+        const n = ((e.clientX - r.left) / r.width - .5) * 2;
+        svg.style.transform = `translateX(${n*4}px)`;
+      });
+      wrap.addEventListener('pointerleave', ()=> svg.style.transform = 'translateX(0)');
+    }
+  })();
+  </script>
+</body>
+</html>
